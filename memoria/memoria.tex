@@ -1,0 +1,91 @@
+\documentclass[a4paper]{book}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{a4wide}
+\usepackage{url}
+\usepackage[pdftex,colorlinks=true,linkcolor=black]{hyperref} %Per fer PDF amb index
+\usepackage[spanish]{babel} % Selecció d'idioma
+\usepackage[utf8]{inputenc}    % Selecció de codepage
+\usepackage{mathptmx}
+\graphicspath{{imagenes/}{diagramas/}}
+
+\pagestyle{headings} % Cap i Peu de pàgines 
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+\begin{document}
+
+\frontmatter
+\title {Control de accesos a partir de rasgos faciales \\ \Large{PAC3 - Preentrega} }
+\author {A. Bruno Rodríguez Rodríguez \\ \normalsize{Máster oficial en Software libre - Universitat Oberta de Catalunya}}
+\date{}
+
+\begin{titlepage}
+\begin{center}
+	% Upper part of the page
+	\includegraphics[width=8cm]{uoc.png}\\[1.5cm]
+ 
+	\textsc{\LARGE Universitat oberta de Catalunya}\\[2cm]
+
+	\textsc{\Huge Proyecto final de máster}\\[1cm]
+
+ 	% Title
+	\HRule \\[1cm]
+	{ \LARGE \bfseries Control de accesos mediante reconocimiento facial}\\[1cm]
+	\HRule \\[2cm]
+
+	\textsc{\Large Máster oficial en software Libre}\\[1cm]
+
+	\textsc{\Large PAC3 - Entrega preliminar}\\[4cm]
+ 
+	% Author and supervisor
+	\begin{minipage}{0.4\textwidth}
+	\begin{flushleft} \large
+	\emph{Autor:}\\
+	A. Bruno \textsc{Rodríguez Rodríguez}
+	\end{flushleft}
+	\end{minipage}
+	\begin{minipage}{0.4\textwidth}
+	\begin{flushright} \large
+	\emph{Director:} \\
+	Gregorio \textsc{Robles}
+	\end{flushright}
+	\end{minipage}
+
+	\vfill
+ 
+	% Bottom of the page
+	{\large \today}
+ 
+\end{center}
+\end{titlepage}
+
+%\maketitle
+
+\setcounter{tocdepth}{3}
+% Numerem fins a la subsecció
+\setcounter{secnumdepth}{3}
+
+\tableofcontents % Índex
+\newpage
+\listoffigures % Llista de figures
+
+\mainmatter
+
+\include{introduccion}
+\include{procesado}
+\include{aplicaciones}
+\include{resultados}
+
+\bibliographystyle{siam}
+\bibliography{biblio}
+
+%% Apéndices
+\appendix
+
+\chapter{Licencia}
+\include{gpl}
+
+\end{document}

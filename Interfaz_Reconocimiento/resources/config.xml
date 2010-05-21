@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><config>
+	<camera>
+		<deviceNumber>
+			1
+		</deviceNumber>
+		<cascadeFile>
+			./resources/haarcascade_frontalface_alt.xml	
+		</cascadeFile>
+		<param name="brightness">
+			0.85
+		</param>
+	</camera>
+	
+	
+	<accessDatabase>
+		<dbDriver>
+			POSTGRES
+		</dbDriver>
+		<param name="dbServer">
+			tocho.cosa.com
+		</param>
+		<param name="dbName">
+			dbJetos
+		</param>
+		<param name="dbPort">
+			6969
+		</param>
+		<param name="dbUser">
+			usuario_teto
+		</param>
+		<param name="dbPassword">
+			teto_teto_adivina_que_hago
+		</param>
+		</accessDatabase>
+	
+	
+	<biometricDatabase>
+		<dbDriver>
+			SQLITE
+		</dbDriver>
+		<param name="dbFile">
+			../BBDD_Caracteristicas/BDCaracteristicas.bd
+		</param>
+	</biometricDatabase>
+
+	<recoPreferences>
+		<Gray>0</Gray>
+		<ShowFaces>1</ShowFaces>
+		<ShowFeatures>1</ShowFeatures>
+	</recoPreferences>
+	
+
+</config>

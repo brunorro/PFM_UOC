@@ -1,0 +1,87 @@
+\chapter{Resultados obtenidos}
+
+\section{Consideraciones previas}
+
+\subsection{Juegos de pruebas}
+Para realizar las pruebas de reconocimiento facial se han empleado las imágenes que la universidad tecnológica de California alberga en 
+\begin{verbatim}
+http://www.vision.caltech.edu/Image_Datasets/faces/faces.tar 
+\end{verbatim}
+Es un fichero tar que cuenta con 451 imágenes frontales de aproximadamente 27 individuos (32 si contamos varios dibujos e individuos sin suficientes fotografías como para poder comprobar problemas intragrupo). Se ha decidido emplear este conjunto de imágenes por los siguientes motivos:
+\begin{itemize}
+	\item{Número suficiente de imágenes y de individuos como para poder considerar los resultados aceptables mediante estadística.}
+	\item{Condiciones variables de luminosidad y de enfoque. Tenemos la posibilidad de comprobar la robustez del reconocimiento facial en condiciones variadas.}
+	\item{Fondos de la fotografía variados. Gracias a esta característica podemos comprobar con facilidad la tasa de falsos positivos en la detección facial.}
+	\item{Buena resolución de las imágenes capturadas: cada fotografía es un JPG de 896x592 píxeles, que es una mayor resolución incluso que la que obtenemos con la cámara empleada (640x480), así que el tiempo de procesado es comparable al de la imagen capturada.\footnote{El tiempo de captura de imagen vía cámara no es despreciable y añade un overheading al respecto.} }
+\end{itemize}
+
+Sobre este subconjunto de imágenes se tomarán las estadísticas de calidad de funcionamiento (Tasa de falsos rechazos/Tasa de falsos aciertos) y rendimiento (Tiempo de ejecución).
+
+\subsection{Conceptos estadísticos empleados}
+Para el análisis estadístico realizado se han empleado los conceptos definidos a continuación:
+\begin{itemize}
+	\item{La \textbf{tasa de falsa aceptación (TFA)}\footnote{En inglés conocida como \textbf{False acceptation rate (FAR)}.} se define como el porcentaje de muestras en las que se ha extraído un falso positivo o una falsa identificación. La TFA mide la robustez del sistema.}
+	\item{La \textbf{tasa de falso rechazo (TFR)}\footnote{En inglés conocida como \textbf{False rejection rate (FRR)}.} se define como el porcentaje de muestras en las que debiendo dar un resultado positivo, se devuelve un resultado negativo. La TFR mide la "comodidad de uso" del sistema en el sentido de que por parte del usuario no sea necesaria mayor interacción de la requerida. }
+\end {itemize}
+
+En este proyecto la TFA se calcularía a partir del número de individuos reconocidos como otro cualquiera mientras que la TFR se calcula a partir de las muestras que no reconocen al individuo aún estando situado frente a la cámara.
+
+Cuando ambos porcentajes dependen de una variable (supongamos un umbral cualquiera como pueda ser grado de igualdad, tamaño de muestra, etc.) se representan en gráficas TFA/TFR. El punto óptimo de trabajo es aquel en el que se minimiza la TFA mientras la TFR se mantiene en valores aceptables que coincide con el punto donde ambas curvas se cruzan, pero sacrificando uno de los dos aspectos se puede adaptar el sistema a otros entornos.
+
+\section{Estadísticas}
+
+Las estadísticas a tomar son las siguientes:
+
+\subsection{Estadísticas en localización facial}
+El algoritmo empleado es eficiente y eficaz. Hubo 5 falsos negativos sobre 451 imágenes. Sobre las 446 restantes, se hallaron 69 falsos positivos. 
+
+\section{Eficiencia en máquina}
+\subsection{Tiempos de ejecución}
+%stats_carga_imagen.tex
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/stats_carga_imagen.tex}
+        \caption{Tiempo de carga de imagen}
+        \label{fig:tiempo_carga_imagen}
+\end{figure}
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/stats_grises.tex}
+        \caption{Tiempo de paso a escala de grises}
+        \label{fig:tiempo_grises}
+\end{figure}
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/stats_loc_cara.tex}
+        \caption{Tiempo de hallar la cara}
+        \label{fig:tiempo_loc_cara}
+\end{figure}
+
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/stats_escalado.tex}
+        \caption{Tiempo de escalado de cara}
+        \label{fig:tiempo_carga_imagen}
+\end{figure}
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/stats_ecualizacion.tex}
+        \caption{Tiempo de ecualizacion de histograma}
+        \label{fig:tiempo_carga_imagen}
+\end{figure}
+
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/stats_facciones.tex}
+        \caption{Tiempo de localización de facciones}
+        \label{fig:tiempo_facciones}
+\end{figure}
+
+%stats_carga_imagen.tex  stats_ecualizacion.tex  stats_escalado.tex  stats_facciones.tex  stats_grises.tex  stats_loc_cara.tex
+
+\subsection{Uso de memoria}
+
+\section{Estimación de costes}
+\subsection{Consideraciones}
+\subsection{Costes de Hardware}
+\subsection{Tiempo empleado}

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<config>
+	<database><dbDriver>SQLITE</dbDriver><param name="dbFile">../BBDD_GestorAccesos/GestorAccesos.bd</param></database>
+</config>

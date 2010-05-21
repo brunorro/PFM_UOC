@@ -1,0 +1,154 @@
+\chapter{Análisis de requerimientos}
+
+\section{Consideraciones de utilización}
+%Condiciones de iluminación, fondo, fotografías, etc.
+En la realización del proyecto se tomarán las siguientes consideraciones:
+\begin{itemize}
+	\item{Las condiciones de iluminación serán constantes o similares.}
+	\item{Cuanto menos variaciones tenga el fondo sobre el que se capturará la imagen del sujeto en cuestión también será mejor la robustez del sistema}
+	\item{Se debe de tener en cuenta que el sistema reconoce fotografías de individuos puestas frente a la cámara como tales. Habría que mantener algún tipo de control sobre este problema.}
+\end{itemize}
+	
+Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo sistema electrónico:
+\begin{itemize}
+	\item{Fallos hardware (por desgaste)}
+	\item{Cortes eléctricos y de comunicaciones}
+	\item{Ruido electromagnético}
+	\item{Condiciones de humedad y temperatura}
+	\item{Desastres: incendios, inundaciones, terremotos...}
+\end{itemize}
+
+\subsection{Hardware empleado}
+El proyecto ha nacido como una solución de bajo coste y por tanto, los elementos que se han empleado se pueden encontrar fácilmente en el mercado doméstico a bajo coste. Los elementos hardware empleados han sido:
+\begin{itemize}
+	\item{Una webcam doméstica como dispositivo de captura}
+	\item{Un ordenador personal.}
+% Dar más detalles del PC
+\end{itemize}
+
+\subsection{Dispositivo de captura}
+
+\begin{figure}[h!]
+        \centering
+	\includegraphics[height=4cm]{imagenes/camara_empleada.jpg}
+	\includegraphics[height=4cm]{imagenes/camara_actual.jpg}
+	\includegraphics[height=4cm]{imagenes/bayer_mosaic.png}
+        \caption{Dispositivo de captura}
+	\label{fig:webcam}
+\end{figure}
+
+En cuanto a la webcam, se eligió uno de los modelos más económicos que se encontraron. El fabricante comentaba que la cámara tenía 1.3 Megapíxeles, pero se debe tener en cuenta que los fabricantes indican el número de slots que tiene el sensor CMOS como megapíxels. Por cada 4 slots del sensor CMOS (agrupados en grupos de rojo, verde, verde, azul) tenemos un píxel real \footnote{Empleando la interpolación de Bayer, obtenemos un valor BGR de 3 bytes por cada píxel, que luego se convierte a RGB vía software para mostrar por pantalla.} con lo que la resolución real de la cámara es de unos 0,3 megapíxels. Por consiguiente, el tamaño del frame es de 640x480=307200 píxeles de 3 bytes cada uno (para cada uno de los colores indicados). 
+
+En cuanto al resto de las características de la cámara, comentar que tiene incorporado un micrófono que no se ha empleado en ningún momento y que en teoría no ha afectado al desarrollo del proyecto. También hay que tener en cuenta que dicha cámara disponía de iluminación propia (4 leds) que, aunque bastante molesta, daban unas condiciones bastante homogéneas en cuanto a iluminación a costa de en muchos momentos sobreexponer la imagen. Se optó por hacer la mayoría de las pruebas tapando dichos leds con cinta aislante por las molestias que causaban. Actualmente el fabricante ha conservado el soporte de la cámara pero ha retirado los LEDs. También se modificó el soporte de la cámara, recortando y limando el soporte de sujección/pinza que tenía debido a que hacía más complicado el uso de ella. En la figura \ref{fig:webcam} se pueden ver, de izquierda a derecha, la cámara que se ha empleado para hacer las pruebas, el modelo que distribuye actualmente el vendedor (nótese la ausencia de LEDs) y el detalle de un sensor CCD de Webcam económica, donde cada cuadrado 2x2 (colores verde-azul-rojo-verde) corresponde a un píxel.
+
+\subsection{Escenario}
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/pasos_sistema.tex}
+        \caption{Procedimiento estándar de reconocimiento}
+	\label{fig:pasos_captura}
+\end{figure}
+
+El procedimiento estándar de funcionamiento del sistema consta de los pasos mostrados en la figura \ref{fig:pasos_captura} y en los sucesivos apartados se dará una explicación más intensiva de cada uno de ellos.
+
+\section{Captura de imágenes}
+La librería opencv dispone de la interfaz highgui que proporciona una capa de abstracción para que la obtención de imágenes desde una webcam sea un proceso sencillo. Dicha capa de abstracción permite capturar únicamente conociendo el Identificador de dispositivo que pertoca.
+%Aplicación 
+
+\subsection{Preprocesado de la imagen}
+Para trabajar con la imagen, lo primero que se hace es un paso del formato BGR que captura la cámara a escala de grises. La imagen resultante pasa de tener 3 canales a un único canal, lo cual hace mucho más eficiente y rápido el procesado de esta. Asimismo se pueden aplicar con mayor facilidad modificaciones en el histograma (normalización para tratar de reducir problemas en cuanto a variaciones en iluminación.
+%Imágenes en color y BN de caras
+
+\section{Determinación de la ubicación de la cara}
+Para determinar las coordenadas en las que se encuentra la cara se utiliza el método mediante detección en cascada con identificadores de Haar comentado en la entrada \cite{ViolaJones} de la bibliografía. Este es un algoritmo que requiere de un entrenamiento de imágenes en las que se haya identificado la forma que se desea extraer. Este entrenamiento genera un clasificador en cascada\footnote{Un buen clasificador en cascada se obtiene a partir de las 7000 imágenes. El clasificador empleado en este proyecto era el que venía por defecto con la librería Opencv.} gracias al cual después la búsqueda de los objetos con formas similares al solicitado es muy rápida. 
+%Casi toda la teoría, con dibujitos, formulitas y SOBRETODO referencia al Viola-Jones
+
+
+
+\subsection{Escalado de la imagen}
+Una vez se ha hallado la ubicación de la cara, se escala el tamaño de ésta para poder estandarizar parte de los procesos. El tamaño que se ha considerado más válido para trabajar es el de 128x128 píxeles, a 1 byte per píxel. En la gran mayoría de las imágenes de los juegos de prueba este tamaño es inferior al detectado, pero en caso de tener que ampliar la imagen se aplicaría un filtro bilinear por la relación calidad/tiempo de ampliación que suele tener.
+
+Un filtro bilinear se encarga de escalar una imagen interpolando los cuatro píxeles más cercanos a la posición futura. En este caso, dado que estamos reduciendo la imagen, se puede considerar una adición de ruido despreciable. Dada la situación de la figura \ref{fig:interp_bilinear}, donde los píxeles los píxeles de la imagen original serían $P(1,1), P(1,2), P(2,1)$ y $P(2,2)$, $d$ la distancia en el eje $y$ del resultado interpolado al píxel original y $d'$ el análogo del anterior en el eje $x$, el valor de $P'(x,y)$ en la imagen interpolada se calcularía según la siguiente fórmula:
+
+\[ P'(x,y) = P(1,1) (1-d) (1-d')+ P(1,2) d (1-d') + P(2,1) d (1-d') + P(2,2) d d'
+\]
+
+\begin{figure}[h!]
+        \centering
+        \input{diagramas/interp_bilinear.tex}
+        \caption{Esquema de interpolación bilinear}
+	\label{fig:interp_bilinear}
+\end{figure}
+
+Tras este paso, por consiguiente, habremos reducido el tamaño de trabajo a una matriz de 128x128 bytes. Escrito de manera formal, tendríamos que la imagen M se corresponde con la siguiente matriz:
+
+\[ M=\left( \begin{array}{lcccccr} 
+	m_{0,0} & m_{0,1} & m_{0,2} & \hdots & m_{0,125} & m_{0,126} & m_{0,127}\\
+	m_{1,0} & m_{1,1} & m_{1,2} & \hdots & m_{1,125} & m_{1,126} & m_{1,127}\\
+	\vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+	m_{126,0} & m_{126,1} & m_{126,2} & \hdots & m_{126,125} & m_{126,126} & m_{126,127}\\
+	m_{127,0} & m_{127,1} & m_{127,2} & \hdots & m_{127,125} & m_{127,126} & m_{127,127}
+	\end{array} \right)
+\]
+
+%\[ \forall  m_{i,j} \in \mathbb{N} \and i_{i,j} \in \left[ 0..255 \right] \]
+Donde $ \forall m_{i,j} \mid m_{i,j} \in \mathbb{N}_{\left[ 0,255 \right]} \wedge i,j \in \mathbb{N}_{\left[ 0,127 \right]} $
+	
+
+\subsection{Ubicación de los rasgos faciales}
+Una vez disponemos de la cara ya escalada en BN, se llevan a cabo dos procesos:
+\begin{itemize}
+	\item{Localización de bordes aplicando el detector Sobel únicamente en orientación vertical}
+	\item{Sobre el resultado previo aplicamos un algoritmo de ventana para hallar la ubicación de los ojos, la nariz y la boca.}
+\end{itemize}
+
+El detector de esquinas Sobel es muy conocido en el procesado de imagen y es relativamente rápido \footnote{Gracias a las mejoras del hardware actual (mayores anchos de banda de memoria, extensiones para el cálculo vectorial, cachés mayores, varios núcleos para paralelizar procesos...) la velocidad del procesado de imágenes ha mejorado exponencialmente. }. Informalmente, el Sobel halla los bordes de la imagen calculando una aproximación a la derivada de ésta, donde los máximos son el lugar donde hay un cambio en la imagen. En este proyecto utilizamos la convolución de la imagen con el siguiente kernel (informalmente, superponemos cada punto de la imagen con la siguiente matriz):
+
+\[ \frac{\partial^{2}{M}}{\partial{y^{2}}} \approx S_{y}''= \left( \begin{array}{ccc} 1 & 2 & 1 \\ -2 & -4 & -2 \\ 1 & 2 & 1  \end{array} \right) * M \]
+
+Donde * es el operador de convolución. Concretamente, este es un kernel de apertura 3 (tamaño 3x3), para el cálculo de la segunda derivada en el eje Y. Nótese que en el proyecto únicamente se ha utilizado el kernel para calcular la derivada vertical, dado que con él hemos obtenido mejores resultados que calculando la derivada en ambos ejes. \footnote{Como comentario, el kernel con el que debería de convolucionarse la imagen para el cálculo de la segunda derivada horizontal sería el resultante de la trasposición del kernel aquí aplicado.}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=8cm]{zonas_busqueda_cara.png}
+	\caption{Máscara aplicada sobre la imagen y tamaños de ventana}
+	\label{fig:imagen_mascaras}
+\end{figure}
+
+Tras la detección de esquinas, procedemos a la búsqueda de los ojos, nariz y boca. Para ello, buscamos en el resultante de aplicar la máscara de la figura \ref{fig:imagen_mascaras} un algoritmo para buscar la ventana del tamaño indicado con suma de mayor valor. La búsqueda se realiza en el eje vertical de la imagen. Informalmente, buscamos la ventana de tamaño WxH (indicados en la imagen) cuyo valor de sumatorio sea el máximo. Formalmente, la región K es la resultante de la máscara que aparece en la imagen y se expresaría de la siguiente manera:
+\[
+ K = \left( 
+	\begin{array}{lcccr} 
+		k_{0,0} & k_{0,1} & \hdots & k_{0,j-2} & k_{0,j-1} \\
+		\vdots & \vdots & \ddots & \vdots & \vdots \\
+		k_{i-1,0} & k_{i-1,1} & \hdots & k_{i-1,j-2} & k_{i-1,j-1} \\
+	\end{array} \right)
+\]
+Y que buscamos el valor de m según la siguiente ecuación. El sumatorio de la submatriz [(0,m), (W,m+H)] tendrá el valor máximo de la máscara indicada.
+\[
+   V = K\left[\left(0,m\right), \left(W,m+H\right) \right] \mid \forall n \sum_{i=0,j=n}^{i=W,j=n+H} K_{i,j} \leq \sum_{p=0,q=m}^{p=W,q=m+H} K_{p,q} 
+\]
+Este método se ha mostrado fiable, rápido y paralelizable (búsqueda de ambos ojos y nariz como tres hilos de ejecución diferentes, y tras el resultado de la detección de la nariz se puede realizar la búsqueda de la boca) aunque se ha reconocido casos en los que puede dar problemas. En la figura \ref{fig:imagenes_procesadas} podemos observar:
+\begin{itemize}
+	\item{A la izquierda la imagen original en color, con la región en la que se ha detectado la cara encuadrada.}
+	\item{A la derecha, la primera imagen desde arriba es la cara detectada tras aplicar la conversión a escala de grises y el redimensionado bilinear.}
+	\item{Bajo la anterior, está la imagen resultante de la aplicación del detector de esquinas Sobel de segundo orden sobre el eje Y.}
+	\item{Por debajo de la anterior, tenemos encuadradas las máximas ventanas según los criterios previamente señalados.}
+	\item{Finalmente, la imagen inferior de la derecha es el resultado de aplicar las ventanas halladas sobre la cara en escala de grises y redimensionada}
+\end{itemize}
+\begin{figure}[h!]
+	\centering
+	%\includegraphics[height=7cm]{ejemplo_imagen_hombre.jpg}
+	\includegraphics[width=12cm]{ejemplo_imagen_mujer.jpg}
+	\caption{Pasos del procesado de la imagen}
+	\label{fig:imagenes_procesadas}
+\end{figure}
+%si esto cuela y lo explico bien, doy volteretas
+
+\section{Extracción de características}
+Con lo que hemos podido obtener hasta ahora, toca pasar la imagen por un banco de filtros de Gabor... 
+
+\subsection{Identificación}
+
+\section{Comparación entre huellas faciales}
+Las medidas que se pueden aplicar de distancias entre ...

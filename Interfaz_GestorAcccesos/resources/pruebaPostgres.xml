@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config>
+	<database>
+	<dbDriver>POSTGRES</dbDriver>
+	<param name="dbName">CosaFea</param>
+	<param name="dbServer">localhost</param>
+	<param name="dbPort">4566</param>
+	<param name="dbUserName">pepito</param>
+	<param name="dbPasswd">manolito</param>
+	</database>
+</config>
