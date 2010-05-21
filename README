@@ -3,19 +3,24 @@
 # Control de accesos a partir de reconocimiento facial
 ##############################################################################
 
-V. 0.001 -> Primer commit
---------------------------
+-----------------------------------------------------------------------------
+V. 0.001 
+-----------------------------------------------------------------------------
+
+* Modificada la interfaz de reconocimiento para que los mensajes aparezcan en
+   la barra de estado en lugar de con un simple print.
+
 * Problemas conocidos:
 	Interfaz de gestion de accesos
-	- Depurar y hacer decente
+	- Depurar y adecentar
 	
 	Interfaz de reconocimiento
 	- Problemas en el cambio de dispositivo de captura
 	- Problemas en el cambio de GrayScale a imagen normal
-	- No genera todavia una face signature decente
+	- No genera todavia una face signature 
 	
 	Interfaz de captura 
-	- Nada hecho
+	- Mismos problemas de la interfaz de reconocimiento
 
 	Base de datos de gestion de accesos
 	- Solo implementada en SQLite

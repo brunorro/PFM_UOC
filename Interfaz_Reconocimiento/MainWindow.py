@@ -26,6 +26,7 @@ class MainWindow():
 		self.builder.add_from_file("./resources/MainWindow.glade")
 		self.mainWindow = self.builder.get_object("MainWindow")
 		self.mainImage = self.builder.get_object("MainDrawingarea")
+		self.mainStatusbar = self.builder.get_object("MainStatusbar")
 		self.mainTextview = self.builder.get_object("MainTextview")
 		self.mainTextbuffer = self.mainTextview.get_buffer()
 
@@ -58,9 +59,11 @@ class MainWindow():
 			faces = self.captureDevice.getFaces()
 
 			if len(faces)>0:
-				self.mainTextbuffer.insert_at_cursor("Individuo detectado\n")
+				self.mainStatusbar.push(0,"Individuo detectado")
+				#self.mainTextbuffer.insert_at_cursor("Individuo detectado\n")
 				self.mainTextview.scroll_to_mark(self.mainTextbuffer.get_insert(),0.0)
-
+			else:
+				self.mainStatusbar.push(0,"")
 			#if time.time()-self.initTime >= 30.0:
 			#	self.mainTextbuffer.insert_at_cursor("Frames por segundo: %f \n" % (self.redrawCounter/30.0))
 			#	self.mainTextview.scroll_to_mark(self.mainTextbuffer.get_insert(),0.0)
@@ -72,7 +75,8 @@ class MainWindow():
         		self.mainImage.window.draw_pixbuf(None,(self.parentClass.captureDevice.getPixbuf()).scale_simple(img_width, img_height,gtk.gdk.INTERP_NEAREST),0,0,0,0)
 			self.mainImage.queue_draw()
 		else:
-			self.mainTextbuffer.insert_at_cursor("Camara no configurada\n")
+			self.mainStatusbar.push(0, "Camara no configurada")
+			#self.mainTextbuffer.insert_at_cursor("Camara no configurada\n")
 			self.mainTextview.scroll_to_mark(self.mainTextbuffer.get_insert(),0.0)
 
 	def on_QuitImagemenuitem_activate(self,widget):
@@ -86,10 +90,10 @@ class MainWindow():
 
 	def on_ShowFeaturesCheckmenuitem_toggled(self, widget, data=None):
 		if self.showFeaturesCheckmenuitem.get_active():
-			print "Encuadrar rasgos activo"
+			self.mainStatusbar.push(0, "Encuadrar rasgos activado")
 			self.captureDevice.drawFeatures=1
 		else:
-			print "Encuadrar rasgos inactivo"
+			self.mainStatusbar.push(0, "Encuadrar rasgos desactivado")
 			self.captureDevice.drawFeatures=0
 
 
@@ -98,18 +102,17 @@ class MainWindow():
 			self.showFeaturesCheckmenuitem.set_inconsistent(False)
 			self.showFeaturesCheckmenuitem.set_active(True)
 			self.captureDevice.drawFaces=1
-			print "Encuadrar caras activo"
+			self.mainStatusbar.push(0, "Encuadrar caras activado")
+
 		else:
 			self.showFeaturesCheckmenuitem.set_inconsistent(True)
 			self.captureDevice.drawFaces=0
-			print "Encuadrar caras inactivo"
-
+			self.mainStatusbar.push(0, "Encuadrar caras desactivado")
 
 	def on_GrayCheckmenuitem_toggled(self, widget, data=None):
 		if self.grayCheckmenuitem.get_active():
 			self.captureDevice.gray=1
-			print "Escala de grises activo"
+			self.mainStatusbar.push(0, "Imagen en escala de grises")
 		else:
 			self.captureDevice.gray=0
-			print "Escala de grises inactivo"
-
+			self.mainStatusbar.push(0, "Imagen en color")
