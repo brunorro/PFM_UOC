@@ -1,0 +1,24 @@
+##############################################################################
+# Proyecto fin de master 
+# Control de accesos a partir de reconocimiento facial
+##############################################################################
+
+V. 0.001 -> Primer commit
+--------------------------
+* Problemas conocidos:
+	Interfaz de gestion de accesos
+	- Depurar y hacer decente
+	
+	Interfaz de reconocimiento
+	- Problemas en el cambio de dispositivo de captura
+	- Problemas en el cambio de GrayScale a imagen normal
+	- No genera todavia una face signature decente
+	
+	Interfaz de captura 
+	- Nada hecho
+
+	Base de datos de gestion de accesos
+	- Solo implementada en SQLite
+
+	Base de datos de datos biometricos
+	- Nada hecho
