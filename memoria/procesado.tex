@@ -1,6 +1,6 @@
-\chapter{Análisis de requerimientos}
+\chapter{Entorno del proyecto}
 
-\section{Consideraciones de utilización}
+\section{Análisis de requerimientos}
 %Condiciones de iluminación, fondo, fotografías, etc.
 En la realización del proyecto se tomarán las siguientes consideraciones:
 \begin{itemize}
@@ -104,9 +104,9 @@ Una vez disponemos de la cara ya escalada en BN, se llevan a cabo dos procesos:
 
 El detector de esquinas Sobel es muy conocido en el procesado de imagen y es relativamente rápido \footnote{Gracias a las mejoras del hardware actual (mayores anchos de banda de memoria, extensiones para el cálculo vectorial, cachés mayores, varios núcleos para paralelizar procesos...) la velocidad del procesado de imágenes ha mejorado exponencialmente. }. Informalmente, el Sobel halla los bordes de la imagen calculando una aproximación a la derivada de ésta, donde los máximos son el lugar donde hay un cambio en la imagen. En este proyecto utilizamos la convolución de la imagen con el siguiente kernel (informalmente, superponemos cada punto de la imagen con la siguiente matriz):
 
-\[ \frac{\partial^{2}{M}}{\partial{y^{2}}} \approx S_{y}''= \left( \begin{array}{ccc} 1 & 2 & 1 \\ -2 & -4 & -2 \\ 1 & 2 & 1  \end{array} \right) * M \]
+\[ \frac{\partial^{2}{M}}{\partial{y^{2}}} \approx S_{y}''= \left( \begin{array}{ccc} 1 & 2 & 1 \\ -2 & -4 & -2 \\ 1 & 2 & 1  \end{array} \right) \oplus M \]
 
-Donde * es el operador de convolución. Concretamente, este es un kernel de apertura 3 (tamaño 3x3), para el cálculo de la segunda derivada en el eje Y. Nótese que en el proyecto únicamente se ha utilizado el kernel para calcular la derivada vertical, dado que con él hemos obtenido mejores resultados que calculando la derivada en ambos ejes. \footnote{Como comentario, el kernel con el que debería de convolucionarse la imagen para el cálculo de la segunda derivada horizontal sería el resultante de la trasposición del kernel aquí aplicado.}
+Donde $\oplus$ es el operador de convolución. Concretamente, este es un kernel de apertura 3 (tamaño 3x3), para el cálculo de la segunda derivada en el eje Y. Nótese que en el proyecto únicamente se ha utilizado el kernel para calcular la derivada vertical, dado que con él hemos obtenido mejores resultados que calculando la derivada en ambos ejes. \footnote{Como comentario, el kernel con el que debería de convolucionarse la imagen para el cálculo de la segunda derivada horizontal sería el resultante de la trasposición del kernel aquí aplicado.}
 
 \begin{figure}[h!]
 	\centering
@@ -146,9 +146,94 @@ Este método se ha mostrado fiable, rápido y paralelizable (búsqueda de ambos 
 %si esto cuela y lo explico bien, doy volteretas
 
 \section{Extracción de características}
-Con lo que hemos podido obtener hasta ahora, toca pasar la imagen por un banco de filtros de Gabor... 
+En estos momentos hemos determinado la región de interés a partir de la cual extraeremos la face signature. 
+\subsection{Filtros de Gabor}
+La transormada de Gabor es un caso especial de la transformada en tiempo discreto de Fourier. La función a transformar primero se convoluciona con una Gaussiana\footnote{En el caso unidimensional vendría a ser una multiplicación. En bidimensional es la convolución de la señal y un kernel.} (se puede tratar como una ventana) y al resultado se le realiza una transformada de Fourier. En el caso monodimensional se definiría como:\\
+\[
+	G_{x}(t,f)=\int_{-\infty}^{+\infty}{e^{-\pi(\tau-t)^ 2e^{-2\pi jf \tau}}x(\tau)d\tau}
+\]
+	Debido a que la Gaussiana es una función definida entre $-\infty$ y $+\infty$ se debe asumir un comportamiento finito de ésta para que sea práctica y realizable. Si consideramos que la gaussiana :
+\[
+f(n) = \left\{ 
+\begin{array}{l l}
+	e^{-\pi a^2}\geq 10^{-5} & \parallel a \parallel \leq 1.9143 \\
+	e^{-\pi a^2} < 10^{-5} & \parallel a \parallel > 1.9143 \\
+\end{array} \right.
+\]
+Léase, que a partir de 1,9143 consideramos la contribución despreciable porque es inferior a $10^{-5}$. Haciendo esa aproximación nos queda la siguiente definición:
+\[
+	G_{x}(t,f)=\int_{-1.9143}^{+1.9143}{e^{-\pi(\tau-t)^ 2e^{-2\pi jf \tau}}x(\tau)d\tau}
+\]
+Dicha transformada tiene las siguientes propiedades: invertibilidad, linearidad, desplazamiento, modulación, propiedad de integración de potencia, propiedad de suma de energía, propiedad de reducción de propiedad, integrabilidad y recuperabilidad.\\
+Un filtro de Gabor se podría considerar la aplicación de lo citado previamente al mundo de las señales discretas. Es un filtro lineal empleado en el procesado de imágenes para la detección de esquinas y características. Esta serie de filtros tienen un comportamiento frecuencial y de orientación similar al del córtex visual humano y se consideran particularmente apropiados para representar y discriminar texturas. En el dominio espacial (2 dimensiones) el filtrado de la señal se realiza convolucionándola con el/los correspondiente/s kernel de Gabor. Los kernels de Gabor son una Gaussiana modulada con un plano senoidal, y serían calculados con la siguiente fórmula:
+\[
+g(x,y;\lambda,\theta,\psi,\sigma,\gamma)=e^{-\frac{x'^2+\gamma^2y'^2}{2\sigma^2}}\cos\left(2\pi\frac{x'}{\lambda}+\psi\right)
+\]
+
+En esta expresión tenemos las siguientes variables:
+\begin{itemize}
+	\item{$\lambda$ es la longitud de onda del factor coseno}
+	\item{$\phi$ es la orientación de la normal hacia las bandas paralelas de la función de Gabor\footnote{La función de Gabor ($g_{l,n}(x)=g(x-al)e^{2\pi ibnx}, -\infty < l,n < \infty, g\in L^2(R), \parallel g \parallel=1$ , donde $a$ y $b$ son constantes) fue desarrollada en 1946 por Dennis Gabor y se intentó aplicar para generar sonidos (sin éxito debido a que no tenía en cuenta el análisis frecuencial con respecto al tiempo de las señales de sonido en la vida real). No obstante, sentó precedente para la compresión de sonido y de vídeo. Se puede considerar una predecesora de las Wavelets. } }
+	\item{$\psi$ es el desfase (orientación del kernel) }
+	\item{$\sigma$ es la desviación estándar de la gaussiana convolucionada}
+	\item{$\gamma$ es la ratio de aspecto espacial, que especifica la elipticidad de la función de Gabor con la que convolucionamos la gaussiana anterior.}
+	\item{Los valores $ x'=x\cos\theta + y\sin\theta $ e $ y'=-x\sin\theta + y\cos\theta $ }
+\end{itemize}
+
+
+\subsection{Aplicación de filtros}
+
+
+\subsection{Comparación entre huellas faciales}
+Se han probado diversas medidas de disimilitud entre las huellas faciales extraídas:
+\begin{itemize}
+	\item{Distancia Euclídea ponderada (distancia euclídea entre huellas faciales ponderada)}
+	\item{Distancia And/Or (cociente entre el sumatorio de la and y la or de las huellas faciales)}
+	\item{Distancia Xor/Or (cociente entre la or exclusiva y la or lógica de las huellas faciales)}
+\end{itemize}
+Para facilitar la búsqueda de diferencias, se han probado todas las medidas de similitud umbralizando bajo diferentes valores las imágenes.
+Las medidas de disimilitud se detallan a continuación.
+\subsubsection{Distancia euclídea (ponderada)}
+La distancia euclídea es una 'clásica' para la comparación entre dos señales o similares. Aquí se ha ponderado, empleando la siguiente expresión:
+\[
+D_{euc}(m,n)=\frac{\sum_{x,y=0}^{X,Y}{\sqrt{(m_{x,y}-n_{x,y})^2}}}{XY}
+\]
+Donde $m$ y $n$ son las imágenes y $X$ e $Y$ son el ancho y el alto de éstas. La ponderación viene dada tras la división entre el tamaño de la imagen (el denominador de la fracción). Aunque en vistas a la eficiencia, si tenemos en cuenta que la elevación al cuadrado y la raíz cuadrada se hacen únicamente para evitar que valores positivos y negativos modifiquen el resultado tenemos la siguiente expresión, que ha sido la empleada:
+\[
+D_{euc}(m,n)=\frac{\sum_{x,y=0}^{X,Y}{\parallel m_{x,y}-n_{x,y}\parallel}}{XY}
+\]
+donde $\parallel$ es el valor absoluto de la resta 'píxel a píxel' entre imágenes. Esta medida tiene las siguientes características:
+\begin{itemize}
+	\item{$D_{euc}\in\mathbb{N}_{\left[0,255\right]}$ (el valor de $D_{euc}$ es un natural en el intervalo $\left[0,255\right]$)} 
+	\item{Variabilidad muy alta.}
+	\item{Esta medida se ha mostrado con una validez muy baja.}
+\end{itemize}
+
+\subsubsection{Distancia And/Or}
+La distancia And/Or se ha calculado de la siguiente manera:
+\[
+D_{and}(m,n)=\frac{ \sum_{x,y=0}^{X,Y}(m_{x,y} \wedge n_{x,y}) }{ \sum_{x,y=0}^{X,Y}(m_{x,y} \vee n_{x,y}) }
+\]
+El operador $\wedge$ representa la and (y lógica) bit a bit entre píxel y píxel de la imagen, y el operador $\vee$ la or (o lógica) entre píxeles. 
+\begin{itemize}
+	\item{$D_{and}\in\mathbb{R}_{\left[0,1\right]}$ (el valor de $D_{and}$ es un real en el intervalo $\left[0,1\right]$)} 
+	\item{Variabilidad muy alta.}
+	\item{Esta medida se ha mostrado con una validez muy baja.}
+\end{itemize}
+
+
+\subsubsection{Distancia Xor/Or}
+La distancia Xor/Or se ha calculado de la siguiente manera:
+\[
+D_{xor}(m,n)=\frac{ \sum_{x,y=0}^{X,Y}(m_{x,y} \oplus n_{x,y}) }{ \sum_{x,y=0}^{X,Y}(m_{x,y} \vee n_{x,y}) }
+\]
+En este caso el operador $\oplus$ representa la or exclusiva (XOR) entre píxel y píxel de la imagen, y el operador $\vee$, de igual manera que antes, la OR entre ambos.
+\begin{itemize}
+	\item{$D_{xor}\in\mathbb{R}_{\left[0,1\right]}$ (el valor de $D_{xor}$ es un real en el intervalo $\left[0,1\right]$)} 
+	\item{Variabilidad muy alta.}
+	\item{Esta medida se ha mostrado con una validez muy baja.}
+\end{itemize}
+
 
 \subsection{Identificación}
 
-\section{Comparación entre huellas faciales}
-Las medidas que se pueden aplicar de distancias entre ...

@@ -7,8 +7,9 @@
 V. 0.001 
 -----------------------------------------------------------------------------
 
-* Modificada la interfaz de reconocimiento para que los mensajes aparezcan en
-   la barra de estado en lugar de con un simple print.
+* Cambios en la documentación
+
+* Anyadida la clase FaceSignature
 
 * Problemas conocidos:
 	Interfaz de gestion de accesos
