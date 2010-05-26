@@ -1,5 +1,9 @@
 \begin{thebibliography}{1}
 
+\bibitem{Lee96imagerepresentation}
+{\sc T.~S. Lee}, {\em Image representation using 2d gabor wavelets}, IEEE
+  Trans. Pattern Analysis and Machine Intelligence, 18 (1996), pp.~959--971.
+
 \bibitem{ViolaJones}
 {\sc P.~Viola and M.~Jones}, {\em Robust real-time object detection}, in
   International Journal of Computer Vision, 2001.

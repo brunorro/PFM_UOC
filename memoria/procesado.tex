@@ -165,7 +165,7 @@ Léase, que a partir de 1,9143 consideramos la contribución despreciable porque
 	G_{x}(t,f)=\int_{-1.9143}^{+1.9143}{e^{-\pi(\tau-t)^ 2e^{-2\pi jf \tau}}x(\tau)d\tau}
 \]
 Dicha transformada tiene las siguientes propiedades: invertibilidad, linearidad, desplazamiento, modulación, propiedad de integración de potencia, propiedad de suma de energía, propiedad de reducción de propiedad, integrabilidad y recuperabilidad.\\
-Un filtro de Gabor se podría considerar la aplicación de lo citado previamente al mundo de las señales discretas. Es un filtro lineal empleado en el procesado de imágenes para la detección de esquinas y características. Esta serie de filtros tienen un comportamiento frecuencial y de orientación similar al del córtex visual humano y se consideran particularmente apropiados para representar y discriminar texturas. En el dominio espacial (2 dimensiones) el filtrado de la señal se realiza convolucionándola con el/los correspondiente/s kernel de Gabor. Los kernels de Gabor son una Gaussiana modulada con un plano senoidal, y serían calculados con la siguiente fórmula:
+Un filtro de Gabor \cite{Lee96imagerepresentation} se podría considerar la aplicación de lo citado previamente al mundo de las señales discretas. Es un filtro lineal empleado en el procesado de imágenes para la detección de esquinas y características. Esta serie de filtros tienen un comportamiento frecuencial y de orientación similar al del córtex visual humano y se consideran particularmente apropiados para representar y discriminar texturas. En el dominio espacial (2 dimensiones) el filtrado de la señal se realiza convolucionándola con el/los correspondiente/s kernel de Gabor. Los kernels de Gabor son una Gaussiana modulada con un plano senoidal, y serían calculados con la siguiente fórmula:
 \[
 g(x,y;\lambda,\theta,\psi,\sigma,\gamma)=e^{-\frac{x'^2+\gamma^2y'^2}{2\sigma^2}}\cos\left(2\pi\frac{x'}{\lambda}+\psi\right)
 \]
@@ -177,7 +177,7 @@ En esta expresión tenemos las siguientes variables:
 	\item{$\psi$ es el desfase (orientación del kernel) }
 	\item{$\sigma$ es la desviación estándar de la gaussiana convolucionada}
 	\item{$\gamma$ es la ratio de aspecto espacial, que especifica la elipticidad de la función de Gabor con la que convolucionamos la gaussiana anterior.}
-	\item{Los valores $ x'=x\cos\theta + y\sin\theta $ e $ y'=-x\sin\theta + y\cos\theta $ }
+	\item{Los valores $ x'$ e $y'$ que son cambios de variable para los siguientes valores $ x' =x\cos\theta + y\sin\theta $ e $ y'=-x\sin\theta + y\cos\theta $ }
 \end{itemize}
 
 
@@ -193,21 +193,44 @@ Se han probado diversas medidas de disimilitud entre las huellas faciales extra�
 \end{itemize}
 Para facilitar la búsqueda de diferencias, se han probado todas las medidas de similitud umbralizando bajo diferentes valores las imágenes.
 Las medidas de disimilitud se detallan a continuación.
-\subsubsection{Distancia euclídea (ponderada)}
+\subsubsection{Distancia euclídea ponderada}
 La distancia euclídea es una 'clásica' para la comparación entre dos señales o similares. Aquí se ha ponderado, empleando la siguiente expresión:
 \[
-D_{euc}(m,n)=\frac{\sum_{x,y=0}^{X,Y}{\sqrt{(m_{x,y}-n_{x,y})^2}}}{XY}
+D_{euc}(m,n)=\frac{\sum_{i,j=0}^{X,Y}{\sqrt{(m_{i,j}-n_{i,j})^2}}}{XY}
 \]
 Donde $m$ y $n$ son las imágenes y $X$ e $Y$ son el ancho y el alto de éstas. La ponderación viene dada tras la división entre el tamaño de la imagen (el denominador de la fracción). Aunque en vistas a la eficiencia, si tenemos en cuenta que la elevación al cuadrado y la raíz cuadrada se hacen únicamente para evitar que valores positivos y negativos modifiquen el resultado tenemos la siguiente expresión, que ha sido la empleada:
 \[
-D_{euc}(m,n)=\frac{\sum_{x,y=0}^{X,Y}{\parallel m_{x,y}-n_{x,y}\parallel}}{XY}
+D_{euc}(m,n)=\frac{\sum_{i,j=0}^{X,Y}{\parallel m_{i,j}-n_{i,j}\parallel}}{XY}
 \]
 donde $\parallel$ es el valor absoluto de la resta 'píxel a píxel' entre imágenes. Esta medida tiene las siguientes características:
 \begin{itemize}
 	\item{$D_{euc}\in\mathbb{N}_{\left[0,255\right]}$ (el valor de $D_{euc}$ es un natural en el intervalo $\left[0,255\right]$)} 
-	\item{Variabilidad muy alta.}
-	\item{Esta medida se ha mostrado con una validez muy baja.}
+	\item{Es conmutativa por definición ($D_{euc}(i,j)=D_{euc}(j,i)$)}
+	\item{Es una medida de disimilitud, es decir, que $D_{euc}(i,j) > D_{euc} (i,k)$ significaría que $i$ es más similar a $k$ que $j$}
+	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
 \end{itemize}
+
+Si por ejemplo disponemos de las siguientes matrices:
+\[ M=\left( \begin{array}{lcr}
+	255 & 127 & 255 \\
+	0 & 0 & 255 \\
+	255 & 0 & 0 
+\end{array} \right), N=\left( \begin{array}{lcr}
+	255 & 255 & 0 \\
+	0 & 255 & 255 \\
+	255 & 0 & 127 
+\end{array} \right) 
+\]
+Entonces tendríamos que 
+\[D_{euc}(M,N) = \frac
+	{\sum_{i,j=0}^{3,3}\left( 
+		\begin{array}{lcr}
+			0 & 128 & 255\\ 0 & 255 & 0 \\ 0 & 0 & 127 
+		\end{array} 
+	\right)}
+	{9} = 85
+\]
+
 
 \subsubsection{Distancia And/Or}
 La distancia And/Or se ha calculado de la siguiente manera:
@@ -217,10 +240,41 @@ D_{and}(m,n)=\frac{ \sum_{x,y=0}^{X,Y}(m_{x,y} \wedge n_{x,y}) }{ \sum_{x,y=0}^{
 El operador $\wedge$ representa la and (y lógica) bit a bit entre píxel y píxel de la imagen, y el operador $\vee$ la or (o lógica) entre píxeles. 
 \begin{itemize}
 	\item{$D_{and}\in\mathbb{R}_{\left[0,1\right]}$ (el valor de $D_{and}$ es un real en el intervalo $\left[0,1\right]$)} 
-	\item{Variabilidad muy alta.}
-	\item{Esta medida se ha mostrado con una validez muy baja.}
+	\item{Es conmutativa por definición ($D_{and}(i,j)=D_{and}(j,i)$)}
+	\item{Es una medida de similitud, es decir, que $D_{and}(i,j) > D_{and} (i,k)$ significaría que $i$ es más similar a $j$ que $k$}
+	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
 \end{itemize}
 
+Si disponemos de las matrices del caso anterior:
+\[ M=\left( \begin{array}{lcr}
+	255 & 127 & 255 \\
+	0 & 0 & 255 \\
+	255 & 0 & 0 
+\end{array} \right), N=\left( \begin{array}{lcr}
+	255 & 255 & 0 \\
+	0 & 255 & 255 \\
+	255 & 0 & 127 
+\end{array} \right) 
+\]
+
+Para calcular la $D_{and}(M.N)$ necesitaríamos calcular inicialmente $M \wedge N$ y $M \vee N$
+\[ (M \wedge N)=\left( \begin{array}{lcr}
+	255 & 127 & 0 \\
+	0 & 0 & 255 \\
+	255 & 0 & 0 
+\end{array} \right), (M \vee N)=\left( \begin{array}{lcr}
+	255 & 255 & 255 \\
+	0 & 255 & 255 \\
+	255 & 0 & 127 
+\end{array} \right) 
+\]
+
+El cálculo de la distancia se haría a partir de ambos sumatorios:
+\[D_{and}(M,N) = \frac 
+	{\sum_{i,j=0}^{3,3} M \wedge N} 
+	{\sum_{i,j=0}^{3,3} M \vee N} = \frac {892}{1657} = 0,538322269 
+\]
+Si hacemos la aproximación $ 0,538322269 \approx 0,54 $ tenemos que ambas matrices tienen un índice de similitud del 54\%.
 
 \subsubsection{Distancia Xor/Or}
 La distancia Xor/Or se ha calculado de la siguiente manera:
@@ -230,9 +284,41 @@ D_{xor}(m,n)=\frac{ \sum_{x,y=0}^{X,Y}(m_{x,y} \oplus n_{x,y}) }{ \sum_{x,y=0}^{
 En este caso el operador $\oplus$ representa la or exclusiva (XOR) entre píxel y píxel de la imagen, y el operador $\vee$, de igual manera que antes, la OR entre ambos.
 \begin{itemize}
 	\item{$D_{xor}\in\mathbb{R}_{\left[0,1\right]}$ (el valor de $D_{xor}$ es un real en el intervalo $\left[0,1\right]$)} 
-	\item{Variabilidad muy alta.}
-	\item{Esta medida se ha mostrado con una validez muy baja.}
+	\item{Es conmutativa por definición ($D_{xor}(i,j)=D_{xor}(j,i)$)}
+	\item{Es una medida de disimilitud, es decir, que $D_{xor}(i,j) > D_{xor} (i,k)$ significaría que $i$ es más similar a $k$ que $j$}
+	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
+
 \end{itemize}
+Utilizando las matrices representando imágenes del caso anterior:
+\[ M=\left( \begin{array}{lcr}
+	255 & 127 & 255 \\
+	0 & 0 & 255 \\
+	255 & 0 & 0 
+\end{array} \right), N=\left( \begin{array}{lcr}
+	255 & 255 & 0 \\
+	0 & 255 & 255 \\
+	255 & 0 & 127 
+\end{array} \right) 
+\]
+
+Para calcular la $D_{xor}(M.N)$ utilizaremos $M \oplus N$ y $M \vee N$ (que será la misma que en $D_{and}$)
+\[ (M \oplus N)=\left( \begin{array}{lcr}
+	0 & 128 & 255 \\
+	0 & 255 & 0 \\
+	0 & 0 & 127 
+\end{array} \right), (M \vee N)=\left( \begin{array}{lcr}
+	255 & 255 & 255 \\
+	0 & 255 & 255 \\
+	255 & 0 & 127 
+\end{array} \right) 
+\]
+
+El cálculo de la distancia se haría a partir de ambos sumatorios:
+\[D_{xor}(M,N) = \frac 
+	{\sum_{i,j=0}^{3,3} M \oplus N} 
+	{\sum_{i,j=0}^{3,3} M \vee N} = \frac {765}{1657} = 0,461677731
+\]
+Si hacemos la aproximación $ 0,461677731 \approx 0,46 $ tenemos que ambas matrices tienen un índice de disimilitud del 46\%.
 
 
 \subsection{Identificación}
