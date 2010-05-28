@@ -9,14 +9,58 @@ En la realización del proyecto se tomarán las siguientes consideraciones:
 	\item{Se debe de tener en cuenta que el sistema reconoce fotografías de individuos puestas frente a la cámara como tales. Habría que mantener algún tipo de control sobre este problema.}
 \end{itemize}
 	
-Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo sistema electrónico:
+Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo sistema electrónico. La previsión de ellos incrementa el coste de implantación, a costa de mejorar la disponibilidad en todos los aspectos:
 \begin{itemize}
-	\item{Fallos hardware (por desgaste)}
-	\item{Cortes eléctricos y de comunicaciones}
+	\item{Fallos hardware (por desgaste). Para prevenir estos problemas, se debería replicar los componentes hardware que tengan posibilidad de fallo para dotar de alta disponibilidad a la infraestructura}
+	\begin{itemize}
+		\item{Duplicidad de fuentes de alimentación }
+		\item{Replicación de discos duros: RAID1, RAID5, RAID10 o RAID01. }
+		\item{Multiplicidad de accesos a red, lo cual no únicamente hace la infraestructura tolerante a fallos sino que puede agregar varias tarjetas de red (vía bonding o etherchannel/etherstack) }
+		\item{En caso de almacenamiento compartido vía fibra óptica, replicación de HBA's \footnote{Host bus adapter, tarjetas que sirven para conectar las máquinas a la SAN.}. La replicación de switches de SAN también sería una alternativa a tener en cuenta, pero dispara el coste del sistema. }
+	\end{itemize}
+
+	\item{Cortes eléctricos}
+	\begin{itemize}
+		\item{Se hace necesaria la presencia de sistemas de alimentación ininterrumpida (SAIs) de capacidad calculada para la infraestructura.}
+		\item{En caso de problemas más graves sería necesario tener un circuito alimentado por generadores o similares.}
+	\end{itemize}
+
+	\item{Infraestructura de comunicaciones: aquí los problemas no vienen dados sólo por el desgaste de los componentes, sino que además tenemos que tener en cuenta vulnerabilidades y ataques externos\footnote{A tener en cuenta el uso de rodenticidas. Los roedores tienen una afición especial por los cables UTP-5.}}
+	\begin{itemize}
+		\item{Contra los cortes en comunicaciones, se deberían tener replicadas las conexiones entre todos los switches utilizando STP (802.1W). Un ejemplo de redundancia se puede ver en la figura }
+		\item{Uso de conexiones Gigabit o 10GbE }
+		\item{Particionar la red de manera correcta en cuanto a VLAN's}
+		\item{En caso de uso de redes inalámbricas, uso de encriptación WPA2 PSK o mejor. A ser posible, utilizar 802.1Q}
+		\item{Tener bien separadas las máquinas de acceso externo en DMZs y utilizar VPN para accesos a la red interna. Comprobar la configuración de firewalls.}
+	\end{itemize}
+
+	\begin{figure}[h!]
+        	\centering
+		\input{diagramas/esquema_red.tex}
+        	\caption{Esquema de red de alta disponibilidad.}
+		\label{fig:network_diagram}
+	\end{figure}
+
 	\item{Ruido electromagnético}
+		\begin{itemize}
+			\item{Utilizar a ser posible cables STP o UTP-5 o superior para los cables de comunicaciones}
+			\item{Comprobar distancias entre componentes dentro de los servidores}
+		\end{itemize}
+
 	\item{Condiciones de humedad y temperatura}
-	\item{Desastres: incendios, inundaciones, terremotos...}
+		\begin{itemize}
+			\item{Tener en cuenta la distribución de servidores en el centro de proceso de datos.}
+			\item{Comprobar circuitos de aire acondicionado y conducciones de agua}
+		\end{itemize}
+
+	\item{Desastres naturales: incendios, inundaciones, terremotos, etc. }
+		\begin{itemize}
+			\item{Replicación de centros de procesos de datos (múltiples sites)}
+			\item{Instalar un sistema anti-incendios de gas inergén en el/los centro de proceso de datos. En caso de incendio consume el oxígeno de la sala y minimiza las pérdidas.}
+			\item{Establecer una política de copias de seguridad y mantenerlas a buen recaudo}
+		\end{itemize}
 \end{itemize}
+
 
 \subsection{Hardware empleado}
 El proyecto ha nacido como una solución de bajo coste y por tanto, los elementos que se han empleado se pueden encontrar fácilmente en el mercado doméstico a bajo coste. Los elementos hardware empleados han sido:
@@ -180,8 +224,17 @@ En esta expresión tenemos las siguientes variables:
 	\item{Los valores $ x'$ e $y'$ que son cambios de variable para los siguientes valores $ x' =x\cos\theta + y\sin\theta $ e $ y'=-x\sin\theta + y\cos\theta $ }
 \end{itemize}
 
+En la figura \ref{fig:gabor_example} tenemos un ejemplo del paso de una imagen sobre un banco de filtros de Gabor. La imagen original ocupa el primer tercio de la imagen y se ha elegido expresamente para comprobar la respuesta al filtro. El segundo tercio de la imagen contiene la representación de los kernel que se han empleado para convolucionar la imagen. Están agrupadas verticalmente por las orientaciones $\psi$ (0, 45, 90 y 135º respectivamente), mientras que horizontalmente están agrupadas por la desviación estándar de la gaussiana $\sigma$ (valores 16, 32, 64 y 128). En el tercio inferior se ve el resultado\footnote{Las imágenes han sido escaladas, se tiene que tener en cuenta que cada uno de los resultados tiene el mismo tamaño que la imagen original} de convolucionar la imagen original con cada uno de los kernels. Por ejemplo, cuando aplicamos el kernel con $\psi=0$ en el resultado no vemos la franja horizontal.
+
+\begin{figure}[h!]
+        \centering
+	\includegraphics[height=21cm]{imagenes/Gabor.png}
+        \caption{Aplicación de un banco de filtros de Gabor}
+	\label{fig:gabor_example}
+\end{figure}
 
 \subsection{Aplicación de filtros}
+Para la obtención de una huella facial se han filtrado los rasgos obtenidos por un filtro de Gabor 
 
 
 \subsection{Comparación entre huellas faciales}
@@ -210,7 +263,7 @@ donde $\parallel$ es el valor absoluto de la resta 'píxel a píxel' entre imág
 	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
 \end{itemize}
 
-Si por ejemplo disponemos de las siguientes matrices:
+Si por ejemplo disponemos de las siguientes matrices simulando imágenes de 1 byte per píxel:
 \[ M=\left( \begin{array}{lcr}
 	255 & 127 & 255 \\
 	0 & 0 & 255 \\
