@@ -45,6 +45,7 @@ Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo s
 		\begin{itemize}
 			\item{Utilizar a ser posible cables STP o UTP-5 o superior para los cables de comunicaciones}
 			\item{Comprobar distancias entre componentes dentro de los servidores}
+			\item{Respetar las distancias y los estándares al respecto del montaje de centros de procesado de datos}
 		\end{itemize}
 
 	\item{Condiciones de humedad y temperatura}
@@ -95,13 +96,72 @@ En cuanto al resto de las características de la cámara, comentar que tiene inc
 
 El procedimiento estándar de funcionamiento del sistema consta de los pasos mostrados en la figura \ref{fig:pasos_captura} y en los sucesivos apartados se dará una explicación más intensiva de cada uno de ellos.
 
+\newpage
+
 \section{Captura de imágenes}
 La librería opencv dispone de la interfaz highgui que proporciona una capa de abstracción para que la obtención de imágenes desde una webcam sea un proceso sencillo. Dicha capa de abstracción permite capturar únicamente conociendo el Identificador de dispositivo que pertoca.
 %Aplicación 
 
 \subsection{Preprocesado de la imagen}
-Para trabajar con la imagen, lo primero que se hace es un paso del formato BGR que captura la cámara a escala de grises. La imagen resultante pasa de tener 3 canales a un único canal, lo cual hace mucho más eficiente y rápido el procesado de esta. Asimismo se pueden aplicar con mayor facilidad modificaciones en el histograma (normalización para tratar de reducir problemas en cuanto a variaciones en iluminación.
-%Imágenes en color y BN de caras
+Para trabajar con la imagen, lo primero que se hace es un paso del formato BGR que captura la cámara a escala de grises. La imagen resultante pasa de tener 3 canales a un único canal, lo cual hace mucho más eficiente y rápido el procesado de esta (ocupa un tercio del tamaño original en memoria). Para la conversión de color a escala de grises, se emplea normalmente la siguiente fórmula:
+\[
+	G_{x,y}= 0.3 * R_{x,y} + 0.59 * G_{x,y} + 0.11 * B_{x,y}
+\]
+\begin{itemize}
+	\item{$G_{x,y}$ es el valor en escala de grises del $(x,y)$ de la imagen }
+	\item{$R, G, B$ son las componentes roja, verde y azul, respectivamente, de la imagen original}
+\end{itemize}
+Normalmente, $R_{x,y}, G_{x,y}, B_{x,y} \in \mathbb{N}_{0,255}$ y por tanto también $G_{x,y} \in \mathbb{N}_{0,255}$.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[height=6cm]{imagenes/lena_color_256.jpg}
+	\includegraphics[height=6cm]{imagenes/lena_gray_256.jpg}
+	\caption{Paso a escala de grises}
+	\label{fig:grayscale_conversion}
+\end{figure}
+
+Asimismo se pueden aplicar con mayor facilidad modificaciones en el histograma. La principal de estas modificaciones aplicadas ha sido la normalización durante varios momentos de la obtención de características. Se procede a explicar aquí qué es la normalización, aunque realmente se aplica en pasos posteriores.
+
+La normalización, ecualización o estiramiento lineal del histograma consiste en ampliar la gama cromática empleada en una imagen hasta ajustarla al número máximo de colores de que puede disponer esta imagen. Supongamos que tenemos una imagen en escala de grises ${X}$ y supongamos que $n_{i} \in \mathbb{N}_{0,255}$ es el número de ocurrencias de un nivel de grises $i$. Tenemos que la probabilidad de que haya un pixel con valor i en la imagen es:
+\[
+	p_{x}(i) = p(x=i)=\frac{n-{i}}{n}, 0 \leq i < L
+\]
+Definimos una función de distribución acumulativa ($fda$) que coincide con el histograma normal ecualizado y que se relaciona con $p_{x}$ de la siguiente manera:
+\[
+	fda_{x}(i) = \sum_{j=0}^{i}p_{x}(j)
+\]
+El estiramiento lineal consistirá en la creación de una nueva imagen $y$ en la que se interpolarán los valores de $fda$ a lo largo de todo el espectro de valores disponibles $\mathbb{N}_{0,255}$. Esto lo conseguimos multiplicando por una constante K cada valor para que la función de distribución de la nueva imagen sea:
+\[
+	fda_{y}(i)=iK
+\]
+La función de distribución acumulativa tiene nos permite hacer su inversa, definida como:
+\[
+	y = T(x) = fda_{x}(x)
+\]
+Teniendo en cuenta que $T(x)$ nos devolvería los valores en un intervalo $\left[0..1\right]$ debemos interpolar los valores contra el rango $\mathbb{N}_{0,255}$:
+\[
+	y' = y' (\max{x} - min {x}) + min{x}
+\]
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[height=6cm]{imagenes/lena_gray_256.jpg}
+	\includegraphics[width=6cm, height=2cm]{imagenes/lena_gray_256_hist.png}\\
+	\includegraphics[height=6cm]{imagenes/lena_gray_256_equalized.jpg}
+	\includegraphics[width=6cm, height=2cm]{imagenes/lena_gray_256_equalized_hist.png}
+	\caption{Normalización de histograma}
+	\label{fig:normalize_hist}
+\end{figure}
+
+En la figura \ref{fig:normalize_hist} se muestran respectivamente una imagen en escala de grises junto a su histograma y en la siguiente línea, la misma imagen normalizada junto a su histograma, que podríamos considerar una representación gráfica de la $fda(x)$, donde cada punto en el eje X de la imagen se corresponde a un valor $i$ y en el eje Y vemos la aportación $p_{X}(i)$ que realiza a la imagen. se puede comprobar que:
+\begin{itemize}
+	\item{La imagen normalizada tiene un mayor rango de valores, con lo que aumenta el contraste entre las zonas oscuras y las zonas claras}
+	\item{Como consecuencia de lo anterior, los bordes entre objetos quedan mejor demarcados.}
+	\item{El histograma normalizado ocupa todo el rango $i$ de valores posibles. }
+\end{itemize}
+
+\newpage
 
 \section{Determinación de la ubicación de la cara}
 Para determinar las coordenadas en las que se encuentra la cara se utiliza el método mediante detección en cascada con identificadores de Haar comentado en la entrada \cite{ViolaJones} de la bibliografía. Este es un algoritmo que requiere de un entrenamiento de imágenes en las que se haya identificado la forma que se desea extraer. Este entrenamiento genera un clasificador en cascada\footnote{Un buen clasificador en cascada se obtiene a partir de las 7000 imágenes. El clasificador empleado en este proyecto era el que venía por defecto con la librería Opencv.} gracias al cual después la búsqueda de los objetos con formas similares al solicitado es muy rápida. 
@@ -182,27 +242,28 @@ Este método se ha mostrado fiable, rápido y paralelizable (búsqueda de ambos 
 \end{itemize}
 \begin{figure}[h!]
 	\centering
-	%\includegraphics[height=7cm]{ejemplo_imagen_hombre.jpg}
 	\includegraphics[width=12cm]{ejemplo_imagen_mujer.jpg}
 	\caption{Pasos del procesado de la imagen}
 	\label{fig:imagenes_procesadas}
 \end{figure}
 %si esto cuela y lo explico bien, doy volteretas
 
+\newpage
+
 \section{Extracción de características}
 En estos momentos hemos determinado la región de interés a partir de la cual extraeremos la face signature. 
 \subsection{Filtros de Gabor}
-La transormada de Gabor es un caso especial de la transformada en tiempo discreto de Fourier. La función a transformar primero se convoluciona con una Gaussiana\footnote{En el caso unidimensional vendría a ser una multiplicación. En bidimensional es la convolución de la señal y un kernel.} (se puede tratar como una ventana) y al resultado se le realiza una transformada de Fourier. En el caso monodimensional se definiría como:\\
+La transormada de Gabor es un caso especial de la transformada en tiempo discreto de Fourier. La función a transformar primero se convoluciona con una Gaussiana (se puede tratar como una ventana) y al resultado se le realiza una transformada de Fourier. En el caso monodimensional se definiría como:\\
 \[
 	G_{x}(t,f)=\int_{-\infty}^{+\infty}{e^{-\pi(\tau-t)^ 2e^{-2\pi jf \tau}}x(\tau)d\tau}
 \]
 	Debido a que la Gaussiana es una función definida entre $-\infty$ y $+\infty$ se debe asumir un comportamiento finito de ésta para que sea práctica y realizable. Si consideramos que la gaussiana :
 \[
-f(n) = \left\{ 
-\begin{array}{l l}
+f(n) =  
+\begin{cases}
 	e^{-\pi a^2}\geq 10^{-5} & \parallel a \parallel \leq 1.9143 \\
 	e^{-\pi a^2} < 10^{-5} & \parallel a \parallel > 1.9143 \\
-\end{array} \right.
+\end{cases}
 \]
 Léase, que a partir de 1,9143 consideramos la contribución despreciable porque es inferior a $10^{-5}$. Haciendo esa aproximación nos queda la siguiente definición:
 \[
@@ -221,7 +282,9 @@ En esta expresión tenemos las siguientes variables:
 	\item{$\psi$ es el desfase (orientación del kernel) }
 	\item{$\sigma$ es la desviación estándar de la gaussiana convolucionada}
 	\item{$\gamma$ es la ratio de aspecto espacial, que especifica la elipticidad de la función de Gabor con la que convolucionamos la gaussiana anterior.}
-	\item{Los valores $ x'$ e $y'$ que son cambios de variable para los siguientes valores $ x' =x\cos\theta + y\sin\theta $ e $ y'=-x\sin\theta + y\cos\theta $ }
+	\item{Los valores $ x'$ e $y'$ que son cambios de variable para los siguientes valores:} 
+		\[ x' =x\cos\theta + y\sin\theta \] 
+		\[y'=-x\sin\theta + y\cos\theta \] 
 \end{itemize}
 
 En la figura \ref{fig:gabor_example} tenemos un ejemplo del paso de una imagen sobre un banco de filtros de Gabor. La imagen original ocupa el primer tercio de la imagen y se ha elegido expresamente para comprobar la respuesta al filtro. El segundo tercio de la imagen contiene la representación de los kernel que se han empleado para convolucionar la imagen. Están agrupadas verticalmente por las orientaciones $\psi$ (0, 45, 90 y 135º respectivamente), mientras que horizontalmente están agrupadas por la desviación estándar de la gaussiana $\sigma$ (valores 16, 32, 64 y 128). En el tercio inferior se ve el resultado\footnote{Las imágenes han sido escaladas, se tiene que tener en cuenta que cada uno de los resultados tiene el mismo tamaño que la imagen original} de convolucionar la imagen original con cada uno de los kernels. Por ejemplo, cuando aplicamos el kernel con $\psi=0$ en el resultado no vemos la franja horizontal.
@@ -233,11 +296,152 @@ En la figura \ref{fig:gabor_example} tenemos un ejemplo del paso de una imagen s
 	\label{fig:gabor_example}
 \end{figure}
 
-\subsection{Aplicación de filtros}
-Para la obtención de una huella facial se han filtrado los rasgos obtenidos por un filtro de Gabor 
+\subsection{Obtención de la huella facial}
+Para la obtención de la huella facial se han filtrado los rasgos (ojo derecho, ojo izquierdo, nariz y boca) por un filtro de Gabor. Dependiendo del uso que se le ha dado a la información obtenida tras el filtrado se han tenido en cuenta dos tipos de representación diferentes para la huella facial, las ventajas e inconvenientes de las cuales se detallarán posteriormente.
+
+\begin{itemize}
+	\item{Disposición lateral, en la que el resultado del filtrado por cada orientación se ha concatenado}
+	\item{Superposición, en la que se ha hecho una suma ponderada de todos los resultados del filtrado por cada orientación}
+\end{itemize}
+
+Asímismo, también se ha umbralizado y aplicado el suavizado sobre las huellas faciales para comprobar si estadísticamente existía alguna mejora. También se detalla posteriormente.
+
+\subsubsection{Disposición lateral de filtrados}
+La disposición lateral de es una representación en la que se concatena en el eje X de la imagen cada uno de los resultados de convolucionar la imagen por cada uno de los filtros que forman parte del banco empleado. Las ventajas de este método de almacenamiento de la huella facial son las siguientes:
+\begin{itemize}
+	\item{Mejor respuesta estadística: da mejores resultados cuando se calcula la distancia entre dos face signatures}
+	\item{Mejor visibilidad de cada una de las componentes empleadas}
+\end{itemize}
+A su vez, también tiene los siguientes inconvenientes:
+\begin{itemize}
+	\item{Tamaño de signature dependiente del tamaño del banco de filtros}
+	\item{Mayor ocupación de memoria y de espacio en la base de datos}
+	\item{Tiempos superiores para el cálculo de distancia entre individuos}
+	\item{En caso de cambio del banco de filtros, se deben recrear todas las huellas faciales, toda la base de datos, etc.}
+\end{itemize}
+En la figura \ref{fig:filter_concat} podemos observar el funcionamiento de la concatenación de filtros. En la primera línea tenemos los rasgos obtenidos (ojo derecho, ojo izquierdo, nariz y boca). En las filas subsiguientes están el resultado de concatenar el filtrado de dichos rasgos en ese orden. Cada grupo de tres tiene las orientaciones $\psi = \alpha \in \left[0º,180º\right] | \alpha \mod{45º}=0$ ,  $\psi = \alpha \in \left[0º,180º\right] | \alpha \mod{20º}=0$,  $\psi = \alpha \in \left[0º,180º\right] | \alpha \mod{10º}=0$ respectivamente. Nótese que las imágenes están escaladas (todas tienen la misma altura en realidad), de tal manera que en verdad a cada orientación que se añade se estaría incrementando el tamaño de la huella facial.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=15cm]{imagenes/M2_concat.jpg}\\
+
+	\includegraphics[width=15cm]{imagenes/M2_concat_od_45deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_oi_45deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_nariz_45deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_boca_45deg.png}\\
+
+	\includegraphics[width=15cm]{imagenes/M2_concat_od_20deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_oi_20deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_nariz_20deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_boca_20deg.png}\\
+
+	\includegraphics[width=15cm]{imagenes/M2_concat_od_10deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_oi_10deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_nariz_10deg.png}
+	\includegraphics[width=15cm]{imagenes/M2_concat_boca_10deg.png}
+	\caption{Concatenación de filtrados}
+	\label{fig:filter_concat}
+\end{figure}
+
+\subsubsection{Superposición de filtrados}
+En la superposición de filtrados, ponderamos el resultado de filtrar la imagen por cada uno de los filtros que forman parte del banco y los superponemos todos ellos sobre la imagen. Las ventajas principales de este método de almacenamiento de la huella facial son las siguientes:
+\begin{itemize}
+	\item{Tamaño de la signature constante, y de hecho es el mismo que el de la imagen filtrada}
+	\item{Mejores tiempos en cálculo de distancias}
+	\item{Menor espacio en memoria y en base de datos}
+	\item{En caso de cambio del banco de filtros, puede mantenerse la misma huella facial, aunque las distancias puedan variar significativamente}
+\end{itemize}
+A su vez, también tiene los siguientes inconvenientes:
+\begin{itemize}
+	\item{Peor rendimiento estadístico: da más errores en los cálculos de distancia}
+	\item{Se pierde la capacidad de determinar qué filtro es el que aporta más información a la face signature}
+\end{itemize}
+
+En la figura \ref{fig:filter_superp} podemos observar el funcionamiento de la superposición de filtros. En la primera línea tenemos los rasgos obtenidos (ojo derecho, ojo izquierdo, nariz y boca). En las filas subsiguientes están el resultado de superponer el filtrado de dichos rasgos en ese orden, y con $\psi = \alpha \in \left[0º,180º\right] | \alpha \mod{45º}=0$ ,  $\psi = \alpha \in \left[0º,180º\right] | \alpha \mod{20º}=0$,  $\psi = \alpha \in \left[0º,180º\right] | \alpha \mod{10º}=0$ respectivamente.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=15cm]{imagenes/M2_concat.jpg}\\
+	\includegraphics[width=3.6cm]{imagenes/M2_superpos_od_45deg.png}
+	\includegraphics[width=3.6cm]{imagenes/M2_superpos_od_20deg.png}
+	\includegraphics[width=3.6cm]{imagenes/M2_superpos_od_10deg.png}\\
+	\includegraphics[width=3.6cm]{imagenes/M2_superpos_oi_45deg.png}
+	\includegraphics[width=3.6cm]{imagenes/M2_superpos_oi_20deg.png}
+	\includegraphics[width=3.6cm]{imagenes/M2_superpos_oi_10deg.png}\\
+	\includegraphics[width=3.2cm]{imagenes/M2_superpos_nariz_45deg.png}
+	\includegraphics[width=3.2cm]{imagenes/M2_superpos_nariz_20deg.png}
+	\includegraphics[width=3.2cm]{imagenes/M2_superpos_nariz_10deg.png}\\
+	\includegraphics[width=4cm]{imagenes/M2_superpos_boca_45deg.png}
+	\includegraphics[width=4cm]{imagenes/M2_superpos_boca_20deg.png}
+	\includegraphics[width=4cm]{imagenes/M2_superpos_boca_10deg.png}
+	\caption{Superposición de filtrados}
+	\label{fig:filter_superp}
+\end{figure}
+
+
+\subsubsection{Umbralización}
+La umbralización de una imagen $I$ es un proceso en el que a los píxeles que superan (o están por debajo) de un valor determinado $T$ se les aplica una modificación de valor. Durante la ejecución del proyecto se han probado tres tipos de umbralización: binarización, truncado y reducción a cero\footnote{La librería OpenCV permitía varios tipos más de umbralización.}.
+\begin{itemize}
+	\item{En la binarización a la imagen y al valor umbral (\textit{threshold} en inglés, de ahí el uso de T), se le añade como parámetro el valor M (de máximo) que es el que tomarán los píxeles que sobrepasen el umbral. Se puede ver un ejemplo en la imagen \ref{fig:thr_binarization}, en el que el valor máximo $M=255$ y el valor umbral es $T=(0,30,60,90)$ en la primera fila y $T=(120,150,180,210)$ en la segunda. Formalmente la binarización se define como:}
+	\[
+		thr(I,T,M) = \begin{cases}
+				0, & \text{si $I_{x,y} < T$}\\
+				M, & \text{si $I_{x,y} \geq T$}
+			\end{cases}
+	\]
+
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=8cm]{imagenes/umbral_binarizada.png}\\
+		\caption{Huella facial binarizada}
+		\label{fig:thr_binarization}
+	\end{figure}
+
+	\item{El truncado necesita como parámetros la imagen y el valor umbral, y formalmente se definiría de la siguiente manera:}
+	\[
+		thr(I,T) = \begin{cases}
+				0, & \text{si $I_{x,y} < T$}\\
+				T & \text{si $I_{x,y} \geq T$}
+			\end{cases}
+	\]
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=8cm]{imagenes/umbral_truncada.png}\\
+		\caption{Huella facial truncada}
+		\label{fig:thr_truncate}
+	\end{figure}
+
+	\item{La reducción a cero necesita como parámetros la imagen y el valor umbral, y formalmente se definiría de la siguiente manera:}
+	\[
+		thr(I,T) = \begin{cases}
+				0, & \text{si $I_{x,y} < T$}\\
+				I_{x,y}, & \text{si $I_{x,y} \geq T$}
+			\end{cases}
+	\]
+
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=8cm]{imagenes/umbral_tozero.png}\\
+		\caption{Huella facial con nivel a 0}
+		\label{fig:thr_tozero}
+	\end{figure}
+
+\end{itemize}
+
+\subsubsection{Suavizado}
+El suavizado de una imagen (\textit{smooth} en inglés) consiste en reducir las diferencias entre píxeles colindantes, con lo que el resultado de la operación vendría a ser la imagen desenfocada o 'difuminada'. Existen varios métodos para suavizar una imagen, pero el más común es convolucionar con una gaussiana.
+
+	\begin{figure}[h!]
+		\centering
+		\includegraphics[width=8cm]{imagenes/suavizado.png}\\
+		\caption{Suavizado de imagen}
+		\label{fig:smooth}
+	\end{figure}
+
 
 
 \subsection{Comparación entre huellas faciales}
+
 Se han probado diversas medidas de disimilitud entre las huellas faciales extraídas:
 \begin{itemize}
 	\item{Distancia Euclídea ponderada (distancia euclídea entre huellas faciales ponderada)}
@@ -257,7 +461,7 @@ D_{euc}(m,n)=\frac{\sum_{i,j=0}^{X,Y}{\parallel m_{i,j}-n_{i,j}\parallel}}{XY}
 \]
 donde $\parallel$ es el valor absoluto de la resta 'píxel a píxel' entre imágenes. Esta medida tiene las siguientes características:
 \begin{itemize}
-	\item{$D_{euc}\in\mathbb{N}_{\left[0,255\right]}$ (el valor de $D_{euc}$ es un natural en el intervalo $\left[0,255\right]$)} 
+	\item{$D_{euc}\in\mathbb{R}_{0,255}$ (el valor de $D_{euc}$ es un natural en el intervalo $\left[0,255\right]$)} 
 	\item{Es conmutativa por definición ($D_{euc}(i,j)=D_{euc}(j,i)$)}
 	\item{Es una medida de disimilitud, es decir, que $D_{euc}(i,j) > D_{euc} (i,k)$ significaría que $i$ es más similar a $k$ que $j$}
 	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
@@ -283,7 +487,11 @@ Entonces tendríamos que
 	\right)}
 	{9} = 85
 \]
-
+La distancia euclídea como tal entre una imagen y otra es 85. Podríamos pasarla a un intervalo $p \in \mathbb{R}_{0..1}$ mediante una interpolación sencilla:
+\[
+	p = \frac{D_{euc}}{255}
+\]
+y en este caso la distancia entre matrices sería $D_{euc}=\frac{85}{255}\approx0,333$, lo cual nos indicaría que la similitud entre ambas imágenes es aproximadamente del 33,3\%. Por otro lado, trabajar con números naturales por norma general suele ser menos costoso para la CPU, así que se ha trasladado el resultado de $\mathbb{R}_{0,255}$ a $\mathbb{N}_{0,255}$.
 
 \subsubsection{Distancia And/Or}
 La distancia And/Or se ha calculado de la siguiente manera:
