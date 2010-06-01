@@ -21,14 +21,27 @@ Sobre este subconjunto de imágenes se tomarán las estadísticas de calidad de 
 Para el análisis estadístico realizado se han empleado los conceptos definidos a continuación:
 \begin{itemize}
 	\item{La \textbf{tasa de falsa aceptación (TFA)}\footnote{En inglés conocida como \textbf{False acceptation rate (FAR)}.} se define como el porcentaje de muestras en las que se ha extraído un falso positivo o una falsa identificación. La TFA mide la robustez del sistema.}
-	\item{La \textbf{tasa de falso rechazo (TFR)}\footnote{En inglés conocida como \textbf{False rejection rate (FRR)}.} se define como el porcentaje de muestras en las que debiendo dar un resultado positivo, se devuelve un resultado negativo. La TFR mide la "comodidad de uso" del sistema en el sentido de que por parte del usuario no sea necesaria mayor interacción de la requerida. }
+	\item{La \textbf{tasa de falso error o rechazo (TFE)}\footnote{En inglés conocida como \textbf{False rejection rate (FRR)}.} se define como el porcentaje de muestras en las que debiendo dar un resultado positivo, se devuelve un resultado negativo. La TFE mide la "comodidad de uso" del sistema en el sentido de que por parte del usuario no sea necesaria mayor interacción de la requerida. }
 \end {itemize}
 
-En este proyecto la TFA se calcularía a partir del número de individuos reconocidos como otro cualquiera mientras que la TFR se calcula a partir de las muestras que no reconocen al individuo aún estando situado frente a la cámara.
+Cuando ambos porcentajes dependen de una variable (supongamos un umbral cualquiera como pueda ser grado de igualdad, tamaño de muestra, etc.) se representan en gráficas TFA/TFE. El punto óptimo de trabajo es aquel en el que se minimiza la TFA mientras la TFE se mantiene en valores aceptables. Sacrificando uno de los dos aspectos se puede adaptar el sistema a otros entornos: para mayor seguridad se puede minimizar la TFA y para que los usuarios no necesiten tomar varias muestras se puede reducir la TFE.
 
-Cuando ambos porcentajes dependen de una variable (supongamos un umbral cualquiera como pueda ser grado de igualdad, tamaño de muestra, etc.) se representan en gráficas TFA/TFR. El punto óptimo de trabajo es aquel en el que se minimiza la TFA mientras la TFR se mantiene en valores aceptables que coincide con el punto donde ambas curvas se cruzan, pero sacrificando uno de los dos aspectos se puede adaptar el sistema a otros entornos.
+En este caso, la variable sobre la que se calcula la TFA/TFE es la distancia entre dos individuos, teniendo por un lado los percentiles de la distancia intragrupo (imágenes del mismo individuo) y por otro lado la distancia extragrupo (imágenes de distintos individuos). En la figura \ref{fig:example_TFA} tenemos un ejemplo de gráfica TFA/TFE con una distancia Euclídea. Nótese lo siguiente:
+\begin{itemize}
+	\item{En el eje X tenemos las probabilidades acumuladas (percentiles) de las medidas. En el eje Y tenemos el valor de la distancia para el que tenemos ese percentil. La distancia extragrupo está invertida (1-probabilidad), mientras que la intragrupo está ordenada de manera normal.}
+	\item{El cuadrado azul es el punto bajo el que la $TFA\approx5\%$, lo que quiere decir que todas las muestras que se encuentren a una distancia inferior a la proyección de este sobre el eje Y pertenecerán al mismo individuo.}
+	\item{En la proyección sobre el eje X del punto de cruce (la línea naranja) tenemos la TFA y la TFE de ese punto. La proyección sobre el eje Y nos da el valor de la distancia de corte con la que podemos determinar si un individuo es quien tenemos en la BBDD o no.}
+	\item{La línea naranja que cruza el 'Valor óptimo' con el eje $Y$ es el valor de la distancia donde tenemos una $TFA\approx5\%$ \footnote{Aquí se considera $TFA\approx5$ por los efectos de inferencia estadística.}. En este caso, al ser una distancia euclídea (medida de disimilitud) el valor de corte está por debajo \footnote{Si hablamos de una medida de disimilitud (distancia euclídea, distancia xor/or) el valor de corte está por debajo. Si la medida fuese de similitud (distancia and), el valor de corte estaría por encima.} del cual se consideran dos muestras del mismo individuo. }
+	\item{El cuadrado verde nos da el rango de posibles valores para ajustar la distancia y con los que obtendríamos mejor o peor TFA o TFE. Por ejemplo, si pusiésemos la distancia de corte en 30, tendríamos aproximadamente una $TFE\approx40\%$ (proyección de la probabilidad intragrupo acumulada sobre el eje X) y una $TFA\approx20\%$ ($(1-P)$ donde $P$ es la proyección de la probabilidad intergrupo sobre el eje X).} 
+\end{itemize}
 
-\newpage
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=12cm]{imagenes/grafica_TFA.png}
+	\caption{Explicación de gráfica TFA/TFE}
+	\label{fig:example_TFA}
+\end{figure}
+
 
 \section{Estadísticas}
 
@@ -37,46 +50,206 @@ Las estadísticas a tomar son las siguientes:
 \subsection{Estadísticas en localización facial}
 El algoritmo empleado es eficiente y eficaz. Hubo 5 falsos negativos sobre 451 imágenes. Sobre las 446 restantes, se hallaron 69 falsos positivos. 
 
+\subsection{Estadísticas de funcionamiento}
+
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_3.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_4.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_5.tex}}
+        \caption{TFA/TFE usando distancia XOR/OR (ojo derecho)}
+        \label{fig:superp-xor-od}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_9.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_10.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_11.tex}}
+        \caption{TFA/TFE usando distancia XOR/OR (ojo izquierdo)}
+        \label{fig:superp-xor-oi}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_15.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_16.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_17.tex}}
+        \caption{TFA/TFE usando distancia XOR/OR(nariz)}
+        \label{fig:superp-xor-n}
+\end{figure}
 \newpage
 
-\section{Eficiencia en máquina}
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_21.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_22.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_23.tex}}
+        \caption{TFA/TFE usando distancia XOR/OR (boca)}
+        \label{fig:superp-xor-b}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_3.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_4.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_5.tex}}
+        \caption{TFA/TFE usando distancia AND/OR (ojo derecho)}
+        \label{fig:superp-and-od}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_9.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_10.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_11.tex}}
+        \caption{TFA/TFE usando distancia AND/OR (ojo izquierdo)}
+        \label{fig:superp-and-oi}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_15.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_16.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_17.tex}}
+        \caption{TFA/TFE usando distancia AND/OR (nariz)}
+        \label{fig:superp-and-n}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_21.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_22.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_23.tex}}
+        \caption{TFA/TFE usando distancia AND/OR (boca)}
+        \label{fig:superp-euc-b}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_3.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_4.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_5.tex}}
+        \caption{TFA/TFE usando distancia euclídea (ojo derecho)}
+        \label{fig:superp-euc-od}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_9.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_10.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_11.tex}}
+        \caption{TFA/TFE usando distancia euclídea (ojo izquierdo)}
+        \label{fig:superp-euc-oi}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_15.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_16.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_17.tex}}
+        \caption{TFA/TFE usando distancia euclídea (nariz)}
+        \label{fig:superp-euc-n}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_21.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_22.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_23.tex}}
+        \caption{TFA/TFE usando distancia euclídea (boca)}
+        \label{fig:superp-and-b}
+\end{figure}
+
 \subsection{Tiempos de ejecución}
 %stats_carga_imagen.tex
+
 \begin{figure}[h!]
         \centering
-        \input{diagramas/stats_carga_imagen.tex}
+        \input{diagramas/stats_tiempos/stats_carga_imagen.tex}
         \caption{Tiempo de carga de imagen}
         \label{fig:tiempo_carga_imagen}
 \end{figure}
+
 \begin{figure}[h!]
         \centering
-        \input{diagramas/stats_grises.tex}
+        \input{diagramas/stats_tiempos/stats_grises.tex}
         \caption{Tiempo de paso a escala de grises}
         \label{fig:tiempo_grises}
 \end{figure}
+\newpage
+
 \begin{figure}[h!]
         \centering
-        \input{diagramas/stats_loc_cara.tex}
+        \input{diagramas/stats_tiempos/stats_loc_cara.tex}
         \caption{Tiempo de hallar la cara}
         \label{fig:tiempo_loc_cara}
 \end{figure}
 
 \begin{figure}[h!]
         \centering
-        \input{diagramas/stats_escalado.tex}
+        \input{diagramas/stats_tiempos/stats_escalado.tex}
         \caption{Tiempo de escalado de cara}
         \label{fig:tiempo_carga_imagen}
 \end{figure}
+\newpage
+
 \begin{figure}[h!]
         \centering
-        \input{diagramas/stats_ecualizacion.tex}
+        \input{diagramas/stats_tiempos/stats_ecualizacion.tex}
         \caption{Tiempo de ecualizacion de histograma}
         \label{fig:tiempo_carga_imagen}
 \end{figure}
 
 \begin{figure}[h!]
         \centering
-        \input{diagramas/stats_facciones.tex}
+        \input{diagramas/stats_tiempos/stats_facciones.tex}
         \caption{Tiempo de localización de facciones}
         \label{fig:tiempo_facciones}
 \end{figure}
