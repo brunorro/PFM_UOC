@@ -9,6 +9,7 @@
 \usepackage[spanish]{babel} % Selecció d'idioma
 \usepackage[utf8]{inputenc}    % Selecció de codepage
 \usepackage{mathptmx}
+\usepackage{multirow}
 \graphicspath{{imagenes/}{diagramas/}}
 
 \pagestyle{headings} % Cap i Peu de pàgines 
@@ -18,7 +19,7 @@
 \begin{document}
 
 \frontmatter
-\title {Control de accesos a partir de rasgos faciales \\ \Large{PAC3 - Preentrega} }
+\title {Control de accesos a partir de rasgos faciales \\ \Large{Memoria del Proyecto} }
 \author {A. Bruno Rodríguez Rodríguez \\ \normalsize{Máster oficial en Software libre - Universitat Oberta de Catalunya}}
 \date{}
 
@@ -71,6 +72,7 @@
 \tableofcontents % Índex
 \newpage
 \listoffigures % Llista de figures
+\listoftables
 
 \mainmatter
 
@@ -84,8 +86,10 @@
 
 %% Apéndices
 \appendix
+\chapter{Licencia de la memoria}
+\include{cc-by-sa}
 
-\chapter{Licencia}
+\chapter{Licencia del código}
 \include{gpl}
 
 \end{document}

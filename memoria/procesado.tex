@@ -16,7 +16,7 @@ Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo s
 		\item{Duplicidad de fuentes de alimentación }
 		\item{Replicación de discos duros: RAID1, RAID5, RAID10 o RAID01. }
 		\item{Multiplicidad de accesos a red, lo cual no únicamente hace la infraestructura tolerante a fallos sino que puede agregar varias tarjetas de red (vía bonding o etherchannel/etherstack) }
-		\item{En caso de almacenamiento compartido vía fibra óptica, replicación de HBA's \footnote{Host bus adapter, tarjetas que sirven para conectar las máquinas a la SAN.}. La replicación de switches de SAN también sería una alternativa a tener en cuenta, pero dispara el coste del sistema. }
+		\item{En caso de almacenamiento compartido vía fibra óptica, replicación de HBA's\footnote{Host bus adapter, tarjetas que sirven para conectar las máquinas a la SAN.}. La replicación de switches de SAN también sería una alternativa a tener en cuenta, pero dispara el coste del sistema. }
 	\end{itemize}
 
 	\item{Cortes eléctricos}
@@ -71,6 +71,7 @@ El proyecto ha nacido como una solución de bajo coste y por tanto, los elemento
 % Dar más detalles del PC
 \end{itemize}
 
+\label{sec:capture_device}
 \subsection{Dispositivo de captura}
 
 \begin{figure}[h!]
@@ -82,7 +83,7 @@ El proyecto ha nacido como una solución de bajo coste y por tanto, los elemento
 	\label{fig:webcam}
 \end{figure}
 
-En cuanto a la webcam, se eligió uno de los modelos más económicos que se encontraron. El fabricante comentaba que la cámara tenía 1.3 Megapíxeles, pero se debe tener en cuenta que los fabricantes indican el número de slots que tiene el sensor CMOS como megapíxels. Por cada 4 slots del sensor CMOS (agrupados en grupos de rojo, verde, verde, azul) tenemos un píxel real \footnote{Empleando la interpolación de Bayer, obtenemos un valor BGR de 3 bytes por cada píxel, que luego se convierte a RGB vía software para mostrar por pantalla.} con lo que la resolución real de la cámara es de unos 0,3 megapíxels. Por consiguiente, el tamaño del frame es de 640x480=307200 píxeles de 3 bytes cada uno (para cada uno de los colores indicados). 
+En cuanto a la webcam, se eligió uno de los modelos más económicos que se encontraron. El fabricante comentaba que la cámara tenía 1.3 Megapíxeles, pero se debe tener en cuenta que los fabricantes indican el número de slots que tiene el sensor CMOS como megapíxels. Por cada 4 slots del sensor CMOS (agrupados en grupos de rojo, verde, verde, azul) tenemos un píxel real\footnote{Empleando la interpolación de Bayer, obtenemos un valor BGR de 3 bytes por cada píxel, que luego se convierte a RGB vía software para mostrar por pantalla.} con lo que la resolución real de la cámara es de unos 0,3 megapíxels. Por consiguiente, el tamaño del frame es de 640x480=307200 píxeles de 3 bytes cada uno (para cada uno de los colores indicados). 
 
 En cuanto al resto de las características de la cámara, comentar que tiene incorporado un micrófono que no se ha empleado en ningún momento y que en teoría no ha afectado al desarrollo del proyecto. También hay que tener en cuenta que dicha cámara disponía de iluminación propia (4 leds) que, aunque bastante molesta, daban unas condiciones bastante homogéneas en cuanto a iluminación a costa de en muchos momentos sobreexponer la imagen. Se optó por hacer la mayoría de las pruebas tapando dichos leds con cinta aislante por las molestias que causaban. Actualmente el fabricante ha conservado el soporte de la cámara pero ha retirado los LEDs. También se modificó el soporte de la cámara, recortando y limando el soporte de sujección/pinza que tenía debido a que hacía más complicado el uso de ella. En la figura \ref{fig:webcam} se pueden ver, de izquierda a derecha, la cámara que se ha empleado para hacer las pruebas, el modelo que distribuye actualmente el vendedor (nótese la ausencia de LEDs) y el detalle de un sensor CCD de Webcam económica, donde cada cuadrado 2x2 (colores verde-azul-rojo-verde) corresponde a un píxel.
 
@@ -164,10 +165,34 @@ En la figura \ref{fig:normalize_hist} se muestran respectivamente una imagen en 
 \newpage
 
 \section{Determinación de la ubicación de la cara}
-Para determinar las coordenadas en las que se encuentra la cara se utiliza el método mediante detección en cascada con identificadores de Haar comentado en la entrada \cite{ViolaJones} de la bibliografía. Este es un algoritmo que requiere de un entrenamiento de imágenes en las que se haya identificado la forma que se desea extraer. Este entrenamiento genera un clasificador en cascada\footnote{Un buen clasificador en cascada se obtiene a partir de las 7000 imágenes. El clasificador empleado en este proyecto era el que venía por defecto con la librería Opencv.} gracias al cual después la búsqueda de los objetos con formas similares al solicitado es muy rápida. 
+Para determinar las coordenadas en las que se encuentra la cara se utiliza el método mediante detección en cascada con identificadores de Haar \cite{ViolaJones}. Este es un algoritmo que requiere de un entrenamiento de imágenes en las que se haya identificado la forma que se desea extraer. Este entrenamiento genera un clasificador en cascada\footnote{Un buen clasificador en cascada se obtiene a partir de las 7000 imágenes. El clasificador empleado en este proyecto era el que venía por defecto con la librería Opencv.} gracias al cual después la búsqueda de los objetos con formas similares al solicitado es muy rápida. 
 %Casi toda la teoría, con dibujitos, formulitas y SOBRETODO referencia al Viola-Jones
+\begin{figure}[!hbt]
+	\centering
+	\input{diagramas/clasificadoresHaar.tex}
+	\caption{Identificadores de Haar}
+	\label{fig:Haar_identifiers}
+\end{figure}
 
+\begin{figure}[!hbt]
+	\centering
+	\input{diagramas/integralHaar.tex}
+	\caption{Integral de una imagen}
+	\label{fig:image_integral}
+\end{figure}
 
+La base del funcionamiento del algoritmo es que en lugar de tratar con la imagen píxel a píxel, se trata con integrales de regiones de ella en regiones puntuales (que llamaremos clasificadores), como las que se pueden ver en la figura \ref{fig:Haar_identifiers}. Con estos clasificadores podríamos encontrar varios tipos de contorno en la imagen: con el clasificador A podríamos buscar bordes horizontales, con el B, bordes verticales, con el C líneas horizontales y con el D, líneas diagonales. Las integrales citadas son relativamente sencillas de comprender, dada una imagen $I$, la integral hasta la posición $(x,y)$ que se puede ver en la figura \ref{fig:image_integral} es la suma de los píxeles de esa región de la imagen. Formalmente:
+\[ 
+	iI(x,y) = \sum_{i,j=0}^{x,y}i(i,j)
+\]
+Donde $iI(x,y)$ es la integral de la imagen e $I(x,y)$ es la imagen original. Si se utilizan la recurrencias:
+\[ 
+	s(x,y)=s(x,y)-1 + I(x,y)
+	iI(x,y)=iI(x-1,y)+s(x,y)
+\]
+Donde $s$ es un sumatorio de columnas acumulado, y tanto éste como $iI$ toman valor 0 cuando estamos fuera de los bordes de la imagen, la imagen integral se puee calcular de manera recursiva con un número mínimo de operaciones. La imagen integral no se calcula sobre la totalidad de una imagen completa, sino sobre ventanas (porciones) de ella cuadradas, en el caso del proyecto se ha decidido que el tamaño de la ventana sea de 50x50 píxeles. 
+
+Para la búsqueda de un clasificador correcto para una determinada forma, hay que tener en cuenta que las integrales empleadas nos dan, para cada ventana, un número mucho mayor de subintegrales que de píxeles en la imagen. Para descartar las características no relevantes se ha empleado un sistema de aprendizaje ``AdaBoost''. Éste es un sistema de ``aprendizaje débil'' en el sentido de que para todos los posibles valores $v$ para un clasificador que obtiene, descarta de manera voraz los que no le resultan relevantes. Esto quizá no da el clasificador idóneo, pero teniendo en cuenta que el coste de cálculo del idóneo podría ser $O(2^{v})$, pero la aproximación a este suele ser bastante precisa. En el cuadro \ref{tab:face_detection_stats} se puede observar la eficacia de este método de selección de clasificadores.
 
 \subsection{Escalado de la imagen}
 Una vez se ha hallado la ubicación de la cara, se escala el tamaño de ésta para poder estandarizar parte de los procesos. El tamaño que se ha considerado más válido para trabajar es el de 128x128 píxeles, a 1 byte per píxel. En la gran mayoría de las imágenes de los juegos de prueba este tamaño es inferior al detectado, pero en caso de tener que ampliar la imagen se aplicaría un filtro bilinear por la relación calidad/tiempo de ampliación que suele tener.
@@ -206,11 +231,11 @@ Una vez disponemos de la cara ya escalada en BN, se llevan a cabo dos procesos:
 	\item{Sobre el resultado previo aplicamos un algoritmo de ventana para hallar la ubicación de los ojos, la nariz y la boca.}
 \end{itemize}
 
-El detector de esquinas Sobel es muy conocido en el procesado de imagen y es relativamente rápido \footnote{Gracias a las mejoras del hardware actual (mayores anchos de banda de memoria, extensiones para el cálculo vectorial, cachés mayores, varios núcleos para paralelizar procesos...) la velocidad del procesado de imágenes ha mejorado exponencialmente. }. Informalmente, el Sobel halla los bordes de la imagen calculando una aproximación a la derivada de ésta, donde los máximos son el lugar donde hay un cambio en la imagen. En este proyecto utilizamos la convolución de la imagen con el siguiente kernel (informalmente, superponemos cada punto de la imagen con la siguiente matriz):
+El detector de esquinas Sobel es muy conocido en el procesado de imagen y es relativamente rápido\footnote{Gracias a las mejoras del hardware actual (mayores anchos de banda de memoria, extensiones para el cálculo vectorial, cachés mayores, varios núcleos para paralelizar procesos...) la velocidad del procesado de imágenes ha mejorado exponencialmente. }. Informalmente, el Sobel halla los bordes de la imagen calculando una aproximación a la derivada de ésta, donde los máximos son el lugar donde hay un cambio en la imagen. En este proyecto utilizamos la convolución de la imagen con el siguiente kernel (informalmente, superponemos cada punto de la imagen con la siguiente matriz):
 
 \[ \frac{\partial^{2}{M}}{\partial{y^{2}}} \approx S_{y}''= \left( \begin{array}{ccc} 1 & 2 & 1 \\ -2 & -4 & -2 \\ 1 & 2 & 1  \end{array} \right) \oplus M \]
 
-Donde $\oplus$ es el operador de convolución. Concretamente, este es un kernel de apertura 3 (tamaño 3x3), para el cálculo de la segunda derivada en el eje Y. Nótese que en el proyecto únicamente se ha utilizado el kernel para calcular la derivada vertical, dado que con él hemos obtenido mejores resultados que calculando la derivada en ambos ejes. \footnote{Como comentario, el kernel con el que debería de convolucionarse la imagen para el cálculo de la segunda derivada horizontal sería el resultante de la trasposición del kernel aquí aplicado.}
+Donde $\oplus$ es el operador de convolución. Concretamente, este es un kernel de apertura 3 (tamaño 3x3), para el cálculo de la segunda derivada en el eje Y. Nótese que en el proyecto únicamente se ha utilizado el kernel para calcular la derivada vertical, dado que con él hemos obtenido mejores resultados que calculando la derivada en ambos ejes\footnote{Como comentario, el kernel con el que debería de convolucionarse la imagen para el cálculo de la segunda derivada horizontal sería el resultante de la trasposición del kernel aquí aplicado.}.
 
 \begin{figure}[h!]
 	\centering
@@ -428,8 +453,59 @@ La umbralización de una imagen $I$ es un proceso en el que a los píxeles que s
 
 \end{itemize}
 
+Para el proyecto se ha acabado empleando la binarización, debido a que:
+\begin{itemize}
+\item {Las diferencias en los resultados entre un tipo y otro de umbralización eran despreciables.}
+\item {Gracias a la binarización se puede comprimir el tamaño de las signatures haciendo la siguiente transformación, donde F es la face signature y R sería el resultado:
+\[
+ \begin{cases}
+	F(x,y)=0 & R(x,y)=0 \\
+	F(x,y)=255 & R(x,y)=1
+ \end{cases}
+\]
+Lo cual reduciría el tamaño de la signature a 1/8 de la original\footnote{Esta vendría siendo una aplicación sencilla del algoritmo de Huffman para la compresión de datos.}. }
+\end{itemize}
+
+
 \subsubsection{Suavizado}
-El suavizado de una imagen (\textit{smooth} en inglés) consiste en reducir las diferencias entre píxeles colindantes, con lo que el resultado de la operación vendría a ser la imagen desenfocada o 'difuminada'. Existen varios métodos para suavizar una imagen, pero el más común es convolucionar con una gaussiana.
+El suavizado de una imagen (\textit{smooth} en inglés) consiste en reducir las diferencias entre píxeles colindantes, con lo que el resultado de la operación vendría a ser la imagen desenfocada o ``difuminada''. Existen varios métodos para suavizar una imagen, pero el más común es convolucionar con una gaussiana. Para que esta operación sea lo suficientemente rápida, el kernel de la gaussiana debe de tener valores comunes (3x3, 5x5, 7x7).
+Para el suavizado de las huellas faciales se ha empleado el kernel de una gaussiana 3x3 estándar, que es el siguiente:
+
+\[
+G(X,Y) = \left(
+\begin{array}{lcr}
+	\frac{1}{16} & \frac{2}{16} & \frac{1}{16}\\
+	\frac{2}{16} & \frac{4}{16} & \frac{2}{16}\\
+	\frac{1}{16} & \frac{2}{16} & \frac{1}{16}
+\end{array}
+\right) = \left(
+\begin{array}{lcr}
+	\frac{1}{16} & \frac{1}{8} & \frac{1}{16}\\
+	\frac{1}{8} & \frac{1}{4} & \frac{1}{8}\\
+	\frac{1}{16} & \frac{1}{8} & \frac{1}{16}
+\end{array} \right)
+\]
+
+Para acelerar el proceso, teniendo en cuenta que la gaussiana es una matriz separable (es el producto de otras dos matrices), se puede convolucionar la imagen con dos kernels diferenciados, uno para la componente vertical y otro para la componente horizontal:
+\[
+G(X,Y) = \left[
+\begin{array}{lcr}
+	\frac{1}{16} & \frac{2}{16} & \frac{1}{16}\\
+	\frac{2}{16} & \frac{4}{16} & \frac{2}{16}\\
+	\frac{1}{16} & \frac{2}{16} & \frac{1}{16}
+\end{array}
+\right] = \left[
+\begin{array}{c}
+	\frac{1}{4} \\ \frac{2}{4} \\ \frac{1}{4}
+\end{array}
+\right]
+\left[
+\begin{array}{lcr}
+	\frac{1}{4} & \frac{2}{4} & \frac{1}{4}
+\end{array}
+\right]
+\]
+Que con las extensiones vectoriales de las que disponen hoy día casi todos los procesadores y operaciones de desplazamiento es mucho más rápido de realizar que la convolución por el kernel de 3x3. El resultado de convolucionar una face signature se muestra en la figura \ref{fig:smooth}: a la izquierda de la imagen se puede ver la face signature original, y de izquierda a derecha, se puede observar el suavizado con una gaussiana de 3x3, 5x5 y 7x7, respectivamente.
 
 	\begin{figure}[h!]
 		\centering
@@ -451,7 +527,7 @@ Se han probado diversas medidas de disimilitud entre las huellas faciales extra�
 Para facilitar la búsqueda de diferencias, se han probado todas las medidas de similitud umbralizando bajo diferentes valores las imágenes.
 Las medidas de disimilitud se detallan a continuación.
 \subsubsection{Distancia euclídea ponderada}
-La distancia euclídea es una 'clásica' para la comparación entre dos señales o similares. Aquí se ha ponderado, empleando la siguiente expresión:
+La distancia euclídea es una ``clásica'' para la comparación entre dos señales o similares. Aquí se ha ponderado, empleando la siguiente expresión:
 \[
 D_{euc}(m,n)=\frac{\sum_{i,j=0}^{X,Y}{\sqrt{(m_{i,j}-n_{i,j})^2}}}{XY}
 \]
@@ -459,15 +535,15 @@ Donde $m$ y $n$ son las imágenes y $X$ e $Y$ son el ancho y el alto de éstas. 
 \[
 D_{euc}(m,n)=\frac{\sum_{i,j=0}^{X,Y}{\parallel m_{i,j}-n_{i,j}\parallel}}{XY}
 \]
-donde $\parallel$ es el valor absoluto de la resta 'píxel a píxel' entre imágenes. Esta medida tiene las siguientes características:
+donde $\parallel$ es el valor absoluto de la resta ``píxel a píxel'' entre imágenes. Esta medida tiene las siguientes características:
 \begin{itemize}
 	\item{$D_{euc}\in\mathbb{R}_{0,255}$ (el valor de $D_{euc}$ es un natural en el intervalo $\left[0,255\right]$)} 
 	\item{Es conmutativa por definición ($D_{euc}(i,j)=D_{euc}(j,i)$)}
 	\item{Es una medida de disimilitud, es decir, que $D_{euc}(i,j) > D_{euc} (i,k)$ significaría que $i$ es más similar a $k$ que $j$}
-	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
+	\item{Esta ha sido la medida escogida para filtrados superpuestos, con un umbral de 16. Ha demostrado un comportamiento razonable con respecto al resto de alternativas.}
 \end{itemize}
 
-Si por ejemplo disponemos de las siguientes matrices simulando imágenes de 1 byte per píxel:
+A continuación tenemos un ejemplo de cómo calcularla. Si disponemos de las siguientes matrices simulando imágenes de 1 byte per píxel:
 \[ M=\left( \begin{array}{lcr}
 	255 & 127 & 255 \\
 	0 & 0 & 255 \\
@@ -491,7 +567,7 @@ La distancia euclídea como tal entre una imagen y otra es 85. Podríamos pasarl
 \[
 	p = \frac{D_{euc}}{255}
 \]
-y en este caso la distancia entre matrices sería $D_{euc}=\frac{85}{255}\approx0,333$, lo cual nos indicaría que la similitud entre ambas imágenes es aproximadamente del 33,3\%. Por otro lado, trabajar con números naturales por norma general suele ser menos costoso para la CPU, así que se ha trasladado el resultado de $\mathbb{R}_{0,255}$ a $\mathbb{N}_{0,255}$.
+y en este caso la distancia entre matrices sería $D_{euc}=\frac{85}{255}\approx0,333$, lo cual nos indicaría que la disimilitud entre ambas imágenes es aproximadamente del 33,3\%. Por otro lado, trabajar con números naturales por norma general suele ser menos costoso para la CPU, así que se ha trasladado el resultado de $\mathbb{R}_{0,255}$ a $\mathbb{N}_{0,255}$.
 
 \subsubsection{Distancia And/Or}
 La distancia And/Or se ha calculado de la siguiente manera:
@@ -503,10 +579,10 @@ El operador $\wedge$ representa la and (y lógica) bit a bit entre píxel y píx
 	\item{$D_{and}\in\mathbb{R}_{\left[0,1\right]}$ (el valor de $D_{and}$ es un real en el intervalo $\left[0,1\right]$)} 
 	\item{Es conmutativa por definición ($D_{and}(i,j)=D_{and}(j,i)$)}
 	\item{Es una medida de similitud, es decir, que $D_{and}(i,j) > D_{and} (i,k)$ significaría que $i$ es más similar a $j$ que $k$}
-	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
+	\item{Esta medida ha demostrado un comportamiento inesperadamente inválido\footnote{Se cree que debe de ser por un conjunto de outliers en las comparaciones intergrupo, no en vano son un orden de magnitud superior a las comparaciones intragrupo.}}
 \end{itemize}
 
-Si disponemos de las matrices del caso anterior:
+Por ejemplo, si disponemos de las matrices del caso anterior:
 \[ M=\left( \begin{array}{lcr}
 	255 & 127 & 255 \\
 	0 & 0 & 255 \\
@@ -547,10 +623,10 @@ En este caso el operador $\oplus$ representa la or exclusiva (XOR) entre píxel 
 	\item{$D_{xor}\in\mathbb{R}_{\left[0,1\right]}$ (el valor de $D_{xor}$ es un real en el intervalo $\left[0,1\right]$)} 
 	\item{Es conmutativa por definición ($D_{xor}(i,j)=D_{xor}(j,i)$)}
 	\item{Es una medida de disimilitud, es decir, que $D_{xor}(i,j) > D_{xor} (i,k)$ significaría que $i$ es más similar a $k$ que $j$}
-	\item{Esta medida se ha mostrado con una validez muy baja debido a una muy alta variabilidad.}
+	\item{Esta distancia no se ha escogido porque aún a pesar de dar buenos resultados (de hecho tenía una variabilidad inferior a la euclídea) seguía estando por debajo de la distancia euclídea en el caso de que los filtrados fuesen superpuestos. Para filtrados concatenados, su calidad es superior a la de la distancia euclídea}
 
 \end{itemize}
-Utilizando las matrices representando imágenes del caso anterior:
+Por ejemplo, para calcular la distancia XOR/OR $D_{xor}$ de las matrices (representando imágenes) del caso anterior:
 \[ M=\left( \begin{array}{lcr}
 	255 & 127 & 255 \\
 	0 & 0 & 255 \\
@@ -583,4 +659,4 @@ Si hacemos la aproximación $ 0,461677731 \approx 0,46 $ tenemos que ambas matri
 
 
 \subsection{Identificación}
-
+Como se ha comentado previamente, se ha decidido emplear la distancia Euclídea sobre filtrados superpuestos y con un umbral de 16. Para el proceso de identificación

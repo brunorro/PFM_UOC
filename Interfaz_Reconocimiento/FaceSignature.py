@@ -59,6 +59,13 @@ def __franjaMax (img, alto, ancho, x_ini, y_ini, y_fin):
 	return x_ini,y_max_franja,ancho,alto
 
 def createGaborKernels (inclinations=[0,30,60,90,120,150],kernel_size=9,pos_var=16,pos_w=10, pos_psi=90):
+	""" Crea kernels para el pase por un filtro de Gabor
+	\param inclinations Array de inclinaciones (por defecto son 0,30,60,90,120 y 150 grados)
+	\param kernel_size Tamanyo del kernel a concatenar. Por defecto 9. Trunca al siguiente numero impar.
+	\pos_var Variancia de la gaussiana empleada para generar los kernels
+	\pos_w Parametro Omega para el kernel del filtro de Gabor
+	\pos_psi Parametro Psi para el kernel del filtro de Gabor """
+
 	if kernel_size%2==0:
 		kernel_size+=1
 

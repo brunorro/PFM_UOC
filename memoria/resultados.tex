@@ -12,7 +12,7 @@ Es un fichero tar que cuenta con 451 imágenes frontales de aproximadamente 27 i
 	\item{Número suficiente de imágenes y de individuos como para poder considerar los resultados aceptables mediante estadística.}
 	\item{Condiciones variables de luminosidad y de enfoque. Tenemos la posibilidad de comprobar la robustez del reconocimiento facial en condiciones variadas.}
 	\item{Fondos de la fotografía variados. Gracias a esta característica podemos comprobar con facilidad la tasa de falsos positivos en la detección facial.}
-	\item{Buena resolución de las imágenes capturadas: cada fotografía es un JPG de 896x592 píxeles, que es una mayor resolución incluso que la que obtenemos con la cámara empleada (640x480), así que el tiempo de procesado es comparable al de la imagen capturada.\footnote{El tiempo de captura de imagen vía cámara no es despreciable y añade un overheading al respecto.} }
+	\item{Buena resolución de las imágenes capturadas: cada fotografía es un JPG de 896x592 píxeles, que es una mayor resolución incluso que la que obtenemos con la cámara empleada (640x480), así que el tiempo de procesado es comparable al de la imagen capturada\footnote{El tiempo de captura de imagen vía cámara no es despreciable y añade un overheading al respecto.}. }
 \end{itemize}
 
 Sobre este subconjunto de imágenes se tomarán las estadísticas de calidad de funcionamiento (Tasa de falsos rechazos/Tasa de falsos aciertos) y rendimiento (Tiempo de ejecución).
@@ -26,241 +26,515 @@ Para el análisis estadístico realizado se han empleado los conceptos definidos
 
 Cuando ambos porcentajes dependen de una variable (supongamos un umbral cualquiera como pueda ser grado de igualdad, tamaño de muestra, etc.) se representan en gráficas TFA/TFE. El punto óptimo de trabajo es aquel en el que se minimiza la TFA mientras la TFE se mantiene en valores aceptables. Sacrificando uno de los dos aspectos se puede adaptar el sistema a otros entornos: para mayor seguridad se puede minimizar la TFA y para que los usuarios no necesiten tomar varias muestras se puede reducir la TFE.
 
+\begin{figure}[!hb]
+	\centering
+	\includegraphics[width=12cm]{imagenes/grafica_TFA.png}
+	\caption{Ejemplo de TFA/TFE con una distancia de disimilitud}
+	\label{fig:example_TFA}
+\end{figure}
+
 En este caso, la variable sobre la que se calcula la TFA/TFE es la distancia entre dos individuos, teniendo por un lado los percentiles de la distancia intragrupo (imágenes del mismo individuo) y por otro lado la distancia extragrupo (imágenes de distintos individuos). En la figura \ref{fig:example_TFA} tenemos un ejemplo de gráfica TFA/TFE con una distancia Euclídea. Nótese lo siguiente:
 \begin{itemize}
 	\item{En el eje X tenemos las probabilidades acumuladas (percentiles) de las medidas. En el eje Y tenemos el valor de la distancia para el que tenemos ese percentil. La distancia extragrupo está invertida (1-probabilidad), mientras que la intragrupo está ordenada de manera normal.}
 	\item{El cuadrado azul es el punto bajo el que la $TFA\approx5\%$, lo que quiere decir que todas las muestras que se encuentren a una distancia inferior a la proyección de este sobre el eje Y pertenecerán al mismo individuo.}
 	\item{En la proyección sobre el eje X del punto de cruce (la línea naranja) tenemos la TFA y la TFE de ese punto. La proyección sobre el eje Y nos da el valor de la distancia de corte con la que podemos determinar si un individuo es quien tenemos en la BBDD o no.}
-	\item{La línea naranja que cruza el 'Valor óptimo' con el eje $Y$ es el valor de la distancia donde tenemos una $TFA\approx5\%$ \footnote{Aquí se considera $TFA\approx5$ por los efectos de inferencia estadística.}. En este caso, al ser una distancia euclídea (medida de disimilitud) el valor de corte está por debajo \footnote{Si hablamos de una medida de disimilitud (distancia euclídea, distancia xor/or) el valor de corte está por debajo. Si la medida fuese de similitud (distancia and), el valor de corte estaría por encima.} del cual se consideran dos muestras del mismo individuo. }
+	\item{La línea naranja que cruza el 'Valor óptimo' con el eje $Y$ es el valor de la distancia donde tenemos una $TFA\approx5\%$\footnote{Aquí se considera $TFA\approx5$ por los efectos de inferencia estadística.}. En este caso, al ser una distancia euclídea (medida de disimilitud) el valor de corte está por debajo\footnote{Si hablamos de una medida de disimilitud (distancia euclídea, distancia xor/or) el valor de corte está por debajo. Si la medida fuese de similitud (distancia and), el valor de corte estaría por encima.} del cual se consideran dos muestras del mismo individuo. }
 	\item{El cuadrado verde nos da el rango de posibles valores para ajustar la distancia y con los que obtendríamos mejor o peor TFA o TFE. Por ejemplo, si pusiésemos la distancia de corte en 30, tendríamos aproximadamente una $TFE\approx40\%$ (proyección de la probabilidad intragrupo acumulada sobre el eje X) y una $TFA\approx20\%$ ($(1-P)$ donde $P$ es la proyección de la probabilidad intergrupo sobre el eje X).} 
 \end{itemize}
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=12cm]{imagenes/grafica_TFA.png}
-	\caption{Explicación de gráfica TFA/TFE}
-	\label{fig:example_TFA}
-\end{figure}
-
-
 \section{Estadísticas}
 
-Las estadísticas a tomar son las siguientes:
+Para comprobar la fiabilidad y velocidad del sistema, las estadísticas que se han tomado han sido las siguientes:
+\begin{itemize}
+	\item{Localización facial}
+	\item{Calidad de funcionamiento: TFA/TFE categorizadas por tipo de face signature, distancias, rasgos y umbrales. Cada una de las variables mentadas puede tomar los siguientes valores:
+		\begin{itemize}
+			\item{Tipo de face signature: 
+				\begin{itemize}
+					\item{Superposición de filtrados}
+					\item{Concatenación de filtrados}
+				\end{itemize}}
+			\item{Tipo de distancia: 
+				\begin{itemize}
+					\item{XOR / OR}
+					\item{AND / OR}
+					\item{Euclídea}
+				\end{itemize}}
+			\item{Rasgos: 
+				\begin{itemize}
+					\item{Ojo derecho}
+					\item{Ojo izquierdo}
+					\item{Nariz}
+					\item{Boca}
+				\end{itemize}}
+			\item{Umbral: Binarización con valores de $T=(8,16,32,64)$}
+		\end{itemize}
+
+	Lo cual nos da un total de 48 gráficas que se muestran a continuación agrupadas por el valor de umbralización. De arriba a abajo y de izquierda a derecha los valores de umbralización son $T=(8,16,32,64)$. 
+	}
+	\item{Tiempos de funcionamiento}
+
+\end{itemize}
 
 \subsection{Estadísticas en localización facial}
-El algoritmo empleado es eficiente y eficaz. Hubo 5 falsos negativos sobre 451 imágenes. Sobre las 446 restantes, se hallaron 69 falsos positivos. 
+El algoritmo de detección facial mediante clasificadores de Haar es eficiente y eficaz, pero se debe de tener en cuenta que puede detectar maś de una cara en una misma imagen. Debido a ello se considerará falso positivo aquellas detecciones que, aun pudiendo ser una cara (una fotografía o un dibujo) no son el sujeto de interés. Por falso negativo se considerarán aquellas fotografías en las que no se detecte una cara (por problemas en las condiciones de iluminación, ocultación de parte de los rasgos faciales o fallo del algoritmo). Se pueden ver un ejemplo tanto del primero (nótese que la cara de la foto que hay sobre la mesa se está tomando como positivo) como del segundo tipo de errores en la figura \ref{fig:facial_detection_problems}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=7cm]{imagenes/falso_positivo.jpg}
+	\includegraphics[width=7cm]{imagenes/falso_negativo.jpg}
+	\caption{Falso positivo/negativo en detección facial}
+	\label{fig:facial_detection_problems}
+\end{figure}
+
+Los resultados obtenidos son los siguientes:
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l||r|r|r|}
+		\hline
+		& Número & \% sobre detecciones & \% sobre imágenes \\
+		\hline \hline
+		Aciertos & 446 & 85.77\% & 98.89\%\\
+		Falsos positivos & 69 & 13.27\% & 15.30\% \\
+		Falsos negativos & 5 & 0.96\% & 1.11\% \\
+		\hline
+		Total de imágenes & 451 & 86.73\% & 100\% \\
+		\hline
+		Total de detecciones & 520 & 100\% & 115.30\%\\
+		\hline
+	\end{tabular}
+	\caption{Resultados de la detección facial}
+	\label{tab:face_detection_stats}
+\end{table}
+
+Si consideramos que el juego de pruebas es representativo, la interpretación de estos resultados es claramente positiva. En términos de resultados, los falsos negativos no influyen en el funcionamiento del resto de procesos. Los falsos positivos son más problemáticos porque afectan a la tasa de reconocimiento y al rendimiento del sistema.
 
 \subsection{Estadísticas de funcionamiento}
+Las estadísticas de calidad de funcionamiento son las más importantes del sistema. En estas, suponiendo que el juego de pruebas es representativo, tenemos un indicador bastante fiable del funcionamiento del sistema. Las gráficas se han extraído con el número de comparaciones que aparece en el cuadro \ref{tab:distance_calc_stats}.
+\begin{table}[!hb]
+	\begin{tabular}{|l|r|r|r|}
+		\hline
+		& Distancia AND/OR & Distancia XOR/OR & Distancia Euclídea \\
+		\hline \hline
+		Cálculos intergrupo (entre individuos) & 64957 & 64957 & 64957\\
+		Cálculos intragrupo (mismo individuo) & 11756 & 11756 & 11756 \\
+		Umbrales de binarización & 8,16,32,64 & 8,16,32,64 & 8,16,32,64 \\
+		Rasgos comparados\tiny{Ojo derecho, ojo izquierdo, nariz y boca.} & 4 & 4 & 4 \\
+		\hline
+		Total de comparaciones intraindividuo & 1039312 & 1039312 & 1039312 \\
+		Total de comparaciones extraindividuo & 188096 & 188096 & 188096 \\
+		\hline
+	\end{tabular}
+	\caption{Número de cálculos de distancia realizados}
+	\label{tab:distance_calc_stats}
+\end{table}
 
-\begin{figure}[h!]
+%\clearpage
+Las TFA que se han obtenido trabajando con este juego de pruebas y utilizando el sistema descrito han sido demasiado altas para su uso en un entorno de criticidad media o alta. No obstante, el sistema puede mostrar mejores resultados si fijamos las siguientes variables:
+\begin{itemize}
+	\item{Condiciones de luminosidad constantes y regularidad en la toma de imágenes para reducir la TFA.}
+	\item{Menor número de individuos, para reducir tanto la TFA como la TFE.}
+	\item{Mayor colaboración por parte de los individuos: emplear siempre la misma expresión facial, no cerrar los ojos, etc. para reducir la TFE.}
+\end{itemize}
+A continuación se adjuntan los resultados de las comprobaciones realizadas, a partir de los cuales se ha determinado que los mejores resultados en tiempo y espacio se obtienen mediante el uso de la distancia euclídea con filtrados superpuestos y valor de umbral 16.
+
+\input{diagramas/tablas_eficiencia/tabla_sup_XOR.tex}
+\input{diagramas/tablas_eficiencia/tabla_con_XOR.tex}
+
+\clearpage
+
+\input{diagramas/tablas_eficiencia/tabla_sup_AND.tex}
+\input{diagramas/tablas_eficiencia/tabla_con_AND.tex}
+
+\clearpage
+
+\input{diagramas/tablas_eficiencia/tabla_sup_EUC.tex}
+\input{diagramas/tablas_eficiencia/tabla_con_EUC.tex}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_1.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_2.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_3.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_4.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_5.tex}}
-        \caption{TFA/TFE usando distancia XOR/OR (ojo derecho)}
+        \caption{TFA/TFE con distancia XOR/OR en superposición (ojo derecho)}
         \label{fig:superp-xor-od}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_3.tex}}
+        \caption{TFA/TFE con distancia XOR/OR en concatenación (ojo derecho)}
+        \label{fig:concat-xor-od}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_7.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_8.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_9.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_10.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_11.tex}}
-        \caption{TFA/TFE usando distancia XOR/OR (ojo izquierdo)}
+        \caption{TFA/TFE con distancia XOR/OR en superposición (ojo izquierdo)}
         \label{fig:superp-xor-oi}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_9.tex}}
+        \caption{TFA/TFE con distancia XOR/OR en concatenación (ojo izquierdo)}
+        \label{fig:concat-xor-oi}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_13.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_14.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_15.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_16.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_17.tex}}
-        \caption{TFA/TFE usando distancia XOR/OR(nariz)}
+        \caption{TFA/TFE con distancia XOR/OR en superposición (nariz)}
         \label{fig:superp-xor-n}
 \end{figure}
-\newpage
 
-\begin{figure}[h!]
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_15.tex}}
+        \caption{TFA/TFE con distancia XOR/OR en concatenación (nariz)}
+        \label{fig:concat-xor-n}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_19.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_20.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_21.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_22.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_23.tex}}
-        \caption{TFA/TFE usando distancia XOR/OR (boca)}
+        \caption{TFA/TFE con distancia XOR/OR en superposición (boca)}
         \label{fig:superp-xor-b}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_21.tex}}
+        \caption{TFA/TFE con distancia XOR/OR en concatenación (boca)}
+        \label{fig:concat-xor-b}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_1.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_2.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_3.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_4.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_5.tex}}
-        \caption{TFA/TFE usando distancia AND/OR (ojo derecho)}
+        \caption{TFA/TFE con distancia AND/OR en superposición (ojo derecho)}
         \label{fig:superp-and-od}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_3.tex}}
+        \caption{TFA/TFE con distancia AND/OR en concatenación (ojo derecho)}
+        \label{fig:concat-and-od}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_7.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_8.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_9.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_10.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_11.tex}}
-        \caption{TFA/TFE usando distancia AND/OR (ojo izquierdo)}
+        \caption{TFA/TFE usando distancia AND/OR en superposición (ojo izquierdo)}
         \label{fig:superp-and-oi}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_9.tex}}
+        \caption{TFA/TFE usando distancia AND/OR en concatenación (ojo izquierdo)}
+        \label{fig:concat-and-oi}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_13.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_14.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_15.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_16.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_17.tex}}
-        \caption{TFA/TFE usando distancia AND/OR (nariz)}
+        \caption{TFA/TFE usando distancia AND/OR en superposición (nariz)}
         \label{fig:superp-and-n}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
 	\centering
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_18.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_19.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_20.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_21.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_22.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_23.tex}}
-        \caption{TFA/TFE usando distancia AND/OR (boca)}
-        \label{fig:superp-euc-b}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_15.tex}}
+        \caption{TFA/TFE usando distancia AND/OR en concatenación (nariz)}
+        \label{fig:concat-and-n}
 \end{figure}
 
-\newpage
-\begin{figure}[h!]
-	\centering
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_0.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_1.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_2.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_3.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_4.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_5.tex}}
-        \caption{TFA/TFE usando distancia euclídea (ojo derecho)}
-        \label{fig:superp-euc-od}
-\end{figure}
+\clearpage
 
-\newpage
-\begin{figure}[h!]
-	\centering
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_6.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_7.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_8.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_9.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_10.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_11.tex}}
-        \caption{TFA/TFE usando distancia euclídea (ojo izquierdo)}
-        \label{fig:superp-euc-oi}
-\end{figure}
-
-\newpage
-\begin{figure}[h!]
-	\centering
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_12.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_13.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_14.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_15.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_16.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_17.tex}}
-        \caption{TFA/TFE usando distancia euclídea (nariz)}
-        \label{fig:superp-euc-n}
-\end{figure}
-
-\newpage
-\begin{figure}[h!]
+\begin{figure}[!hb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_19.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_20.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_21.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_22.tex}}
-			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_23.tex}}
-        \caption{TFA/TFE usando distancia euclídea (boca)}
+        \caption{TFA/TFE usando distancia AND/OR en superposición (boca)}
         \label{fig:superp-and-b}
 \end{figure}
 
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_21.tex}}
+        \caption{TFA/TFE usando distancia AND/OR en concatenación (boca)}
+        \label{fig:concat-and-b}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_3.tex}}
+        \caption{TFA/TFE usando distancia euclídea (ojo derecho)}
+        \label{fig:superp-euc-od}
+\end{figure}
+
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_0.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_1.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_2.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_3.tex}}
+        \caption{TFA/TFE usando distancia euclídea (ojo derecho)}
+        \label{fig:concat-euc-od}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_9.tex}}
+        \caption{TFA/TFE usando distancia euclídea (ojo izquierdo)}
+        \label{fig:superp-euc-oi}
+\end{figure}
+
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_6.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_7.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_8.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_9.tex}}
+        \caption{TFA/TFE usando distancia euclídea (ojo izquierdo)}
+        \label{fig:concat-euc-oi}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_15.tex}}
+        \caption{TFA/TFE usando distancia euclídea (nariz)}
+        \label{fig:superp-euc-n}
+\end{figure}
+
+\begin{figure}[!hb]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_12.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_13.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_14.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_15.tex}}
+        \caption{TFA/TFE usando distancia euclídea (nariz)}
+        \label{fig:concat-euc-n}
+\end{figure}
+
+\clearpage 
+
+\begin{figure}[!ht]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_21.tex}}
+        \caption{TFA/TFE usando distancia euclídea (boca)}
+        \label{fig:superp-euc-b}
+\end{figure}
+
+\begin{figure}[!ht]
+	\centering
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_18.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_19.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_20.tex}}
+			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_21.tex}}
+        \caption{TFA/TFE usando distancia euclídea (boca)}
+        \label{fig:concat-euc-b}
+\end{figure}
+
+\clearpage
+
 \subsection{Tiempos de ejecución}
 %stats_carga_imagen.tex
+En este proyecto se buscaban tiempos de ejecución moderados-bajos para que el sistema pueda funcionar en tiempo real (o con un retraso aceptable).
+\begin{itemize}
+	\item{Se ha considerado tiempo real que los tiempos de procesado totales permitan 8 cuadros por segundo.}
+	\item{El hardware sobre el que se han ejecutado las pruebas está detallado en la sección \ref{sec:cost_estimation} y se dan detalles sobre el dispositivo de captura empleado en la sección \ref{sec:capture_device}, siendo la figura \ref{fig:webcam} una foto de ésta.}
+	\item{El juego de pruebas empleado tenía fotos de tamaño superior (896x592) a las imágenes obtenidas vía webcam (640x480). Esto debería dar un margen de error positivo en cuanto al procesado de la imagen.}
+	\item{El tiempo de acceso al disco puede ser inferior al tiempo de captura de imagen desde la webcam, debido a que esta comparte la controladora USB con más dispositivos.}
+\end{itemize}
 
-\begin{figure}[h!]
+Entrando de lleno en el procesado del sistema se ha visto el siguiente comportamiento:
+\begin{itemize}
+	\item{Los algoritmos de preprocesado apenas contribuyen al tiempo total de procesado de imagen. Se ha considerado que estos son los que en su aplicación tienen un tiempo $T_{alg}<=0.01$ segundos. Se puede ver las gráficas de tiempos en la figura \ref{fig:preproc_times}}
+	\item{La búsqueda de cara en las imágenes es relativamente lenta. Viene tardando en torno a $T_{loc}\approx0.2$ segundos, lo que lo convierte en la mayor contribución en cuanto al procesado de la imagen. Los tiempos de las ejecuciones se pueden ver en la figura \ref{fig:proc_times}.}
+	\item{La generación de la signature se ha comportado mejor de lo esperado. La búsqueda de rasgos y la generación de la signature tienen tiempos $\approx0.001$ y $\approx0.015$ segundos, respectivamente. Los tiempos de ambos algoritmos aparecen en la figura \ref{fig:proc_times}.}
+\end{itemize}
+
+\input{diagramas/stats_tiempos/tableTime.tex}
+
+Los tiempos totales por cuadro se vienen situando en torno al tiempo de localización de cara $T_{loc}\approx0.2$, mientras que la contribución del resto de algoritmos se podría considerar mínima. En el cuadro \ref{tab:stats_time} se pueden ver, sobre 752 ejecuciones, los tiempos que se vienen obteniendo. Se muestran máximo, mínimo, mediana y cuartiles 1 y 3 para mostrar que la variabilidad es mayor de lo que mostrarían sólo la media y la desviación estándar. Los tiempos totales se pueden ver en la gráfica \ref{fig:total_times}.
+
+\begin{figure}[!hb]
         \centering
-        \input{diagramas/stats_tiempos/stats_carga_imagen.tex}
-        \caption{Tiempo de carga de imagen}
-        \label{fig:tiempo_carga_imagen}
+		\resizebox{7.25cm}{!}{\input{diagramas/stats_tiempos/stats_escalado.tex}}
+		\resizebox{7.25cm}{!}{\input{diagramas/stats_tiempos/stats_ecualizacion.tex}}
+		\resizebox{10cm}{!}{\input{diagramas/stats_tiempos/stats_grises.tex}}
+        \caption{Gráficas de algoritmos de preprocesado}
+        \label{fig:preproc_times}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[!hb]
         \centering
-        \input{diagramas/stats_tiempos/stats_grises.tex}
-        \caption{Tiempo de paso a escala de grises}
-        \label{fig:tiempo_grises}
-\end{figure}
-\newpage
-
-\begin{figure}[h!]
-        \centering
-        \input{diagramas/stats_tiempos/stats_loc_cara.tex}
-        \caption{Tiempo de hallar la cara}
-        \label{fig:tiempo_loc_cara}
+		\resizebox{7.25cm}{!}{\input{diagramas/stats_tiempos/stats_facciones.tex}}
+		\resizebox{7.25cm}{!}{\input{diagramas/stats_tiempos/stats_facesignature.tex}}
+		\resizebox{10cm}{!}{\input{diagramas/stats_tiempos/stats_loc_cara.tex}}
+        \caption{Gráficas de algoritmos de procesado}
+        \label{fig:proc_times}
 \end{figure}
 
-\begin{figure}[h!]
-        \centering
-        \input{diagramas/stats_tiempos/stats_escalado.tex}
-        \caption{Tiempo de escalado de cara}
-        \label{fig:tiempo_carga_imagen}
-\end{figure}
-\newpage
 
-\begin{figure}[h!]
+\begin{figure}[!hb]
         \centering
-        \input{diagramas/stats_tiempos/stats_ecualizacion.tex}
-        \caption{Tiempo de ecualizacion de histograma}
-        \label{fig:tiempo_carga_imagen}
-\end{figure}
-
-\begin{figure}[h!]
-        \centering
-        \input{diagramas/stats_tiempos/stats_facciones.tex}
-        \caption{Tiempo de localización de facciones}
-        \label{fig:tiempo_facciones}
+        \rotatebox{90}{\resizebox{20cm}{!}{\input{diagramas/stats_tiempos/stats_tiempo_total.tex}}}
+        \caption{Gráfica de tiempos totales}
+        \label{fig:total_times}
 \end{figure}
 
 %stats_carga_imagen.tex  stats_ecualizacion.tex  stats_escalado.tex  stats_facciones.tex  stats_grises.tex  stats_loc_cara.tex
+\clearpage
 
-\subsection{Uso de memoria}
-
-\newpage
-
+\label{sec:cost_estimation}
 \section{Estimación de costes}
-\subsection{Consideraciones}
-\subsection{Costes de Hardware}
-\subsection{Tiempo empleado}
+En esta sección se incluyen los costes en mano de obra y hardware que ha tenido el proyecto. Hay que tener en cuenta que el proyectista ha ejercitado varios roles durante la realización de éste. En ningún momento se busca una compensación económica al respecto, pero se espera que esta estimación pueda ser de utilidad en vistas a la planificación de futuros trabajos o proyectos similares.
+Se tendrán en cuenta los siguientes factores:
+\begin{itemize}
+	\item{Definición de roles requeridos durante la realización del proyecto.}
+	\item{Tiempos de implementación de software.}
+	\item{Costes de instalación y mantenimiento del hardware.}
+\end{itemize}
+
+\subsection{Roles adoptados durante la realización}
+Se considerarán que han sido necesarios los siguientes roles:
+\begin{itemize}
+	\item{\textbf{Consultores científicos}
+		\begin{itemize}
+			\item{Exponen de manera clara los conceptos técnicos a los analistas.}
+			\item{Documentación y primera implementación de algoritmos complejos.}
+			\item{Toma de datos e interpretación de estadísticas sobre tiempos y funcionamiento del proyecto.}
+			\item{Formación universitaria técnica, preferentemente una ingeniería, ciencias exactas, física o química.}
+		\end{itemize}}
+
+	\item{\textbf{Analistas}
+		\begin{itemize}
+			\item{Establece las fases del proyecto y los equipos de trabajo (con sus requerimientos de personal) para cada una de éstas}
+			\item{Ofrece alternativas técnicas (lenguajes de programación, cambios en el hardware, etc.)}
+			\item{Preferentemente ingeniero en informática, con experiencia en metodologías de desarrollo de software}
+			\item{Por norma general, uno de ellos debería asumir el rol de Jefe de proyecto y coordinar los esfuerzos de todos los demás.}
+		\end{itemize}}
+
+	\item{\textbf{Programadores}
+		\begin{itemize}
+			\item{Desarrollan, depuran y mantienen el código de la aplicación.}
+			\item{La titulación está entre un FP2 en informática, Ciclo formativo de grado superior en informática, Ingeniería técnica, Ingeniera superior o Carrera técnica (exactas, física, etc.)}
+			\item{Se debe de tener en cuenta que uno de los principales factores para el éxito del proyecto y la puntualidad en la entrega de éste depende de la calidad de su trabajo, y éste de su motivación (remuneración, conciliación de vida laboral con vida familiar, etc.).}
+		\end{itemize}}
+
+	\item{\textbf{Documentadores}
+		\begin{itemize}
+			\item{Generan los manuales de instrucciones y documentación del producto.}
+			\item{Cualquiera de los roles anteriores puede ejercer este mismo, aunque sí que es recomendable que tengan capacidad redactora aceptable}
+		\end{itemize}}
+
+	\item{\textbf{Técnicos de campo/instaladores}
+		\begin{itemize}
+			\item{Instalan el hardware y el software necesario para la puesta en marcha el sistema.}
+			\item{Virtudes que deberían tener son diligencia en el trabajo, conocimiento del producto y capacidad de comunicación con el cliente.}
+		\end{itemize}}
+
+\end{itemize}
+
+\subsection{Tiempos de implementación de software.}
+Por el trabajo realizado, se han estimado los siguientes costes, en horas lineales. Téngase en cuenta que el incremento de personal en un determinado rol no divide de manera equitativa los tiempos por problemas de coordinación, de requerimientos y presupuesto.
+
+\begin{table}[!hbt]
+	\centering
+	\begin{tabular}{|l|r|}
+		\hline
+		\textbf{Rol} & \textbf{Número de horas} \\
+		\hline \hline	
+		Asesor científico & 80 \\ \hline
+		Analista & 120 \\ \hline
+		Programador & 300 \\ \hline 
+		Documentador & 180 \\ \hline
+		Instaladores/Técnicos & 25 \\ \hline
+	\end{tabular}
+	\caption{Horas lineales de realización del proyecto}
+	\label{tab:project_hours}
+\end{table}
+
+\subsection{Costes de instalación y mantenimiento del hardware.}

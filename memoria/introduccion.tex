@@ -39,12 +39,12 @@ El software FaceIt® de \href{http://www.l1id.com/}{Identix} implementa la biome
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section {Objetivos}
-El objetivo de este proyecto es implementar un sistema de reconocimiento biométrico a partir del reconocimiento de patrones faciales. Mediante este, se implementará un sistema de control de accesos (Reloj de fichajes) para demostrar su correcto funcionamiento. Esta es una aplicación de "relativa" sencillez pero que muestra una de las utilidades que puede dar este sistema. 
+El objetivo de este proyecto es implementar un sistema de reconocimiento biométrico a partir del reconocimiento de patrones faciales. Mediante este, se implementará un sistema de control de accesos (Reloj de fichajes) para demostrar su correcto funcionamiento. Esta es una aplicación de ``relativa'' sencillez pero que muestra una de las utilidades que puede dar este sistema. 
 
 Como subobjetivos podríamos mentar:
 \begin{itemize}
 	\item{Open Source: Todos los componentes empleados deben de tener disponible su código fuente.}
-	\item{Establecer un esquema de BBDD 'genérico' reaprovechable para la captura de otros rasgos biométricos (voz, iris, etc.). }
+	\item{Establecer un esquema de BBDD ``genérico'' reaprovechable para la captura de otros rasgos biométricos (voz, iris, etc.). }
 	\item{Modularidad: Con objeto de poder aislar mejor los problemas que pueda dar un componente y la reutilización de código se encapsulará este en clases que doten de la mayor independencia posible de otros componentes. }
 	\item{Extensibilidad: Implementación bajo herramientas que faciliten añadir nuevas funcionalidades y mejorar las existentes. }
 	\item{Inteligibilidad y documentación de código: Documentación de código para todas las partes que sea posible y uso de nombres de variables explícitos.}
@@ -77,19 +77,19 @@ Como se ha comentado anteriormente, se busca construir un sistema basado en la m
 
 Se ha empleado el siguiente software (cuya licencia se especifica también a continuación) para la implementación del proyecto. En los casos en los que se emplea el símbolo \textgreater (mayor que) es debido a que se han ido aplicando actualizaciones y parches de seguridad sobre dicho software durante el desarrollo del proyecto y la versión puede ser posterior a la indicada.
 \begin{itemize}
-	\item{\textbf{GNU/Linux} es el sistema operativo sobre el que todo se ha desarrollado y se sustenta. Salvo excepciones, la licencia de la gran mayoría de librerías y aplicaciones disponibles para éste es GPL2 o superior.\footnote{Actualmente sólo se ha testeado sobre la distribución Ubuntu.}.}
-	\item{\textbf{Python} en su versión \textgreater2.6 como lenguaje de programación. La licencia aplicada sobre éste es PSFL (Python software foundation license), la cual es compatible con GPL en esta versión del lenguaje.}
-	\item{\textbf{GTK+ y Glade} en sus versiones \textgreater2.16 y \textgreater3.6 para diseñar el entorno gráfico. Los bindings de ésta librería para Python se encapsulan en la librería pygtk. La licencia de todos los componentes es GPL2 o superior.}
+	\item{\textbf{GNU/Linux} es el sistema operativo sobre el que todo se ha desarrollado y se sustenta. Salvo excepciones, la licencia de la gran mayoría de librerías y aplicaciones disponibles para éste es GPLv2 o superior\footnote{Actualmente sólo se ha testeado sobre la distribución Ubuntu.}.}
+	\item{\textbf{Python} en su versión \textgreater2.6 como lenguaje de programación. La licencia aplicada sobre éste es PSFL (Python software foundation license), la cual es compatible con GPLv2 en esta versión del lenguaje.}
+	\item{\textbf{GTK+ y Glade} en sus versiones \textgreater2.16 y \textgreater3.6 para diseñar el entorno gráfico. Los bindings de ésta librería para Python se encapsulan en la librería pygtk. La licencia de todos los componentes es GPLv2 o superior.}
 	\item{\textbf{OpenCV} en su versión \textgreater1.0 como librería principal para la captura y la localización de la región de interés en la imagen. La licencia de dicho software es BSD, lo que permite que pueda ser empleada en proyectos GPL.}
 \end{itemize}
 Asímismo, para la realización de la documentación, gráficas, estadísticas y demás trabajo sobre imágenes se ha empleado el siguiente software:
 \begin{itemize}
-	\item{\textbf{Vim} como editor principal para la realización tanto de la documentación como de la gran mayoría del código fuente. Licencia CharityWare, compatible con GPL2.}
-	\item{\LaTeX{} para la documentación, concretamente en la distribución Texlive. Licencia GPL2 o superior.}
-	\item{\textbf{Doxygen} para la documentación del código. Licencia GPL2 o superior. También se ha empleado el plugin \textit{Doxypy} que es un filtro para poder incluir tags de doxygen en los comentarios habituales de python y cuya licencia también es GPL2.}
-	\item{\textbf{Dia} para la elaboración de diagramas. Licencia GPL2 o superior. Los diagramas se han exportado a \textit{tikz} que es una librería para generación de gráficos vectoriales en \LaTeX{}, licencia GPL2. }
-	\item{\textbf{Gnuplot} para la elaboración de gráficas estadísticas, exportadas a formato \LaTeX{}. La licencia NO es GPL2, aunque sí que es Free Software y sólo se empleará para realizar gráficas.}
-	\item{\textbf{Gimp} para el retoque de imágenes (principalmente pantallazos y similares). Licencia GPL2 o superior.}
+	\item{\textbf{Vim} como editor principal para la realización tanto de la documentación como de la gran mayoría del código fuente. Licencia CharityWare, compatible con GPLv2.}
+	\item{\LaTeX{} para la documentación, concretamente en la distribución Texlive. Licencia GPLv2 o superior.}
+	\item{\textbf{Doxygen} para la documentación del código. Licencia GPLv2 o superior. También se ha empleado el plugin \textit{Doxypy} que es un filtro para poder incluir tags de doxygen en los comentarios habituales de python y cuya licencia también es GPLv2.}
+	\item{\textbf{Dia} para la elaboración de diagramas. Licencia GPLv2 o superior. Los diagramas se han exportado a \textit{tikz} que es una librería para generación de gráficos vectoriales en \LaTeX{}, licencia GPLv2. }
+	\item{\textbf{Gnuplot} para la elaboración de gráficas estadísticas, exportadas a formato \LaTeX{}. La licencia NO es GPLv2, aunque sí que es Free Software y sólo se empleará para realizar gráficas.}
+	\item{\textbf{Gimp} para el retoque de imágenes (principalmente pantallazos y similares). Licencia GPLv2 o superior.}
 \end{itemize}
 
 La gran mayoría (si no todo) el software empleado tiene una comunidad activa de colaboradores, soporte vía foros, manuales y documentación disponible en internet. 
@@ -104,11 +104,18 @@ El sistema de control de versiones a emplear es GIT. GitHUB se ha considerado la
 	\item{Tablón para colgar anuncios en cuanto a la evolución del proyecto}
 	\item{Interfaces web para editar código online, mostrar grafos de versionado, portapapeles de copiado web (pastebin), etc.}
 \end{itemize}
-Se ha decidido emplear una cuenta gratuíta en GitHUB, la cual ofrece hasta 300 Mb de almacenamiento, aun en las previsiones más extremas el tamaño del código no llega a ese nivel, y se creará un repositorio en dicha cuenta (el tiempo de creación es despreciable). Los datos del usuario que se emplearán son los siguientes:
+Se ha decidido emplear una cuenta gratuíta en GitHUB, la cual ofrece hasta 300 Mb de almacenamiento, aun en las previsiones más extremas el tamaño del código no llega a ese nivel, y se creará un repositorio en dicha cuenta (el tiempo de creación es despreciable). Una de las múltiples vistas de este sitio aparece en la figura \ref{fig:interface_git}.  Los datos del usuario que se emplearán son los siguientes:
 \begin{itemize}
 	\item{\textbf{Nombre de usuario}: brunorro}
 	\item{\textbf{Cuenta de correo}: br1.rdgz@gmail.com}
 \end{itemize}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=11cm]{imagenes/interfazGit.png}
+	\caption{Lista de commits de GitHub}
+	\label{fig:interface_git}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -121,5 +128,4 @@ Se han estimado los siguientes puntos a los que imputar el tiempo empleado:
 	\item{\textbf{Determinación de la representación en la BD}: Referente a la base de datos previa, durante este tiempo se investigará el método de almacenamiento para la representación facial.}
 	\item{\textbf{Estadísticas}: Toma de datos y cálculos (gráficas) de eficiencia temporal, espacial y de funcionamiento.}
 \end{itemize}
-La planificación aproximada de trabajo por tareas hasta la próxima entrega es la siguiente (el eje temporal son los días a partir de la entrega de este informe). No se puede garantizar que los tiempos del diagrama vayan a ser cumplidos estrictamente. Los retrasos observados en esta planificación temporal se tendrán en cuenta para la última entrega.
-
+En la sección \ref{sec:cost_estimation} se definen los roles necesarios para llevar el proyecto, sus funciones y las estimaciones de tiempo de trabajo para cada uno de ellos. Tras la liberación se espera que los aspectos del desarrollo que no ha dado tiempo a finalizar (por falta de tiempo) se puedan pulir.
