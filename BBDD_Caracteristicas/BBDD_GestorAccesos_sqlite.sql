@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS Empleado (
 	l2DireccionEmpleado VARCHAR(64) DEFAULT NULL,
 	tlf1Empleado VARCHAR(14) DEFAULT NULL,
 	tlf2Empleado VARCHAR(14) DEFAULT NULL,
-	mailEmpleado VARCHAR(14) DEFAULT NULL);
+	mailEmpleado VARCHAR(14) DEFAULT NULL, 
+	imagenEmpleado VARCHAR(255) DEFAULT NULL);
 
 INSERT INTO Empleado (idEmpresa, idDepartamento, nifEmpleado, nombreEmpleado, 
 	apellidosEmpleado) VALUES (0,0,'00000000A','E1','A1');

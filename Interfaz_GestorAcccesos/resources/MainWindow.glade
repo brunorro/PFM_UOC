@@ -22,6 +22,48 @@
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="DepartmentComboListStore">
+    <columns>
+      <!-- column-name DepartmentId -->
+      <column type="guint"/>
+      <!-- column-name DepartmentName -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="EmployeeComboListStore">
+    <columns>
+      <!-- column-name EmployeeId -->
+      <column type="guint"/>
+      <!-- column-name EmployeeName -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="WhereEmployeeComboListStore">
+    <columns>
+      <!-- column-name OperationId -->
+      <column type="gint"/>
+      <!-- column-name OperationName -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0">0</col>
+        <col id="1" translatable="yes">M&#xE1;s de</col>
+      </row>
+      <row>
+        <col id="0">1</col>
+        <col id="1" translatable="yes">Menos de</col>
+      </row>
+      <row>
+        <col id="0">2</col>
+        <col id="1" translatable="yes">Exactamente</col>
+      </row>
+      <row>
+        <col id="0">-1</col>
+        <col id="1" translatable="yes">Indiferente</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="MainWindow">
     <property name="width_request">640</property>
     <property name="height_request">480</property>
@@ -52,7 +94,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkSeparatorMenuItem" id="MainSeparatormenuitemFile1">
+                      <object class="GtkSeparatorMenuItem" id="MainSeparatormenuitemFile">
                         <property name="visible">True</property>
                       </object>
                     </child>
@@ -503,22 +545,26 @@
                                 <property name="label_xalign">0</property>
                                 <property name="shadow_type">in</property>
                                 <child>
-                                  <object class="GtkAlignment" id="ReportDialogEmployeeFrameAlignment1">
+                                  <object class="GtkAlignment" id="ReportDialogEmployeeFrameAlignment">
                                     <property name="visible">True</property>
                                     <property name="left_padding">12</property>
                                     <child>
-                                      <object class="GtkVBox" id="ReportDialogEmployeeFrameVbox1">
+                                      <object class="GtkVBox" id="ReportDialogEmployeeFrameVbox">
                                         <property name="visible">True</property>
                                         <property name="orientation">vertical</property>
                                         <child>
-                                          <object class="GtkTable" id="ReportDialogEmployeeFrameTable1">
+                                          <object class="GtkTable" id="ReportDialogEmployeeFrameTable">
                                             <property name="visible">True</property>
                                             <property name="n_rows">2</property>
                                             <property name="n_columns">4</property>
                                             <child>
-                                              <object class="GtkComboBoxEntry" id="WhereEmployeeComboboxentry1">
+                                              <object class="GtkComboBoxEntry" id="WhereEmployeeComboboxentry">
                                                 <property name="height_request">22</property>
                                                 <property name="visible">True</property>
+                                                <property name="model">WhereEmployeeComboListStore</property>
+                                                <property name="active">0</property>
+                                                <property name="text_column">1</property>
+                                                <signal name="changed" handler="on_WhereEmployeeComboboxentry_changed"/>
                                               </object>
                                               <packing>
                                                 <property name="left_attach">1</property>
@@ -530,12 +576,13 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkEntry" id="WhereHoursEntry1">
+                                              <object class="GtkEntry" id="WhereHoursEntry">
                                                 <property name="height_request">20</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
-                                                <property name="max_length">2</property>
+                                                <property name="max_length">4</property>
                                                 <property name="invisible_char">&#x2022;</property>
+                                                <signal name="changed" handler="on_WhereHoursEntry_changed"/>
                                               </object>
                                               <packing>
                                                 <property name="left_attach">2</property>
@@ -547,9 +594,11 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkComboBoxEntry" id="FromEmployeeComboboxentry1">
+                                              <object class="GtkComboBoxEntry" id="FromEmployeeComboboxentry">
                                                 <property name="height_request">22</property>
                                                 <property name="visible">True</property>
+                                                <property name="model">EmployeeComboListStore</property>
+                                                <property name="text_column">1</property>
                                               </object>
                                               <packing>
                                                 <property name="left_attach">1</property>
@@ -559,9 +608,11 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkComboBoxEntry" id="ToEmployeeComboboxentry1">
+                                              <object class="GtkComboBoxEntry" id="ToEmployeeComboboxentry">
                                                 <property name="height_request">22</property>
                                                 <property name="visible">True</property>
+                                                <property name="model">EmployeeComboListStore</property>
+                                                <property name="text_column">1</property>
                                               </object>
                                               <packing>
                                                 <property name="left_attach">3</property>
@@ -571,13 +622,13 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkLabel" id="FromEmployeeLabel1">
+                                              <object class="GtkLabel" id="FromEmployeeLabel">
                                                 <property name="visible">True</property>
                                                 <property name="label" translatable="yes">Desde</property>
                                               </object>
                                             </child>
                                             <child>
-                                              <object class="GtkLabel" id="WhereLabel1">
+                                              <object class="GtkLabel" id="WhereLabel">
                                                 <property name="visible">True</property>
                                                 <property name="label" translatable="yes">Con</property>
                                               </object>
@@ -587,7 +638,7 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkLabel" id="ToEmployeeLabel1">
+                                              <object class="GtkLabel" id="ToEmployeeLabel">
                                                 <property name="visible">True</property>
                                                 <property name="label" translatable="yes">Hasta</property>
                                               </object>
@@ -597,7 +648,7 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkLabel" id="WhereHoursLabel1">
+                                              <object class="GtkLabel" id="WhereHoursLabel">
                                                 <property name="visible">True</property>
                                                 <property name="label" translatable="yes">horas</property>
                                               </object>
@@ -615,7 +666,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkCheckButton" id="EmployeeSubtotalsCheckbutton1">
+                                          <object class="GtkCheckButton" id="EmployeeSubtotalsCheckbutton">
                                             <property name="label" translatable="yes">Generar subtotales por empleado</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
@@ -631,7 +682,7 @@
                                   </object>
                                 </child>
                                 <child type="label">
-                                  <object class="GtkLabel" id="ReportDialogEmployeeFrameLabel1">
+                                  <object class="GtkLabel" id="ReportDialogEmployeeFrameLabel">
                                     <property name="visible">True</property>
                                     <property name="label" translatable="yes">&lt;b&gt;Empleados&lt;/b&gt;</property>
                                     <property name="use_markup">True</property>
@@ -645,23 +696,23 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkFrame" id="ReportDialogDepartmentFrame1">
+                              <object class="GtkFrame" id="ReportDialogDepartmentFrame">
                                 <property name="visible">True</property>
                                 <property name="label_xalign">0</property>
                                 <property name="shadow_type">out</property>
                                 <child>
-                                  <object class="GtkAlignment" id="ReportDialogDepartmentFrameAlignment1">
+                                  <object class="GtkAlignment" id="ReportDialogDepartmentFrameAlignment">
                                     <property name="visible">True</property>
                                     <property name="left_padding">12</property>
                                     <child>
-                                      <object class="GtkVBox" id="ReportDialogDepartmentFrameVbox1">
+                                      <object class="GtkVBox" id="ReportDialogDepartmentFrameVbox">
                                         <property name="visible">True</property>
                                         <property name="orientation">vertical</property>
                                         <child>
-                                          <object class="GtkHBox" id="ReportDialogDepartmentFrameHbox1">
+                                          <object class="GtkHBox" id="ReportDialogDepartmentFrameHbox">
                                             <property name="visible">True</property>
                                             <child>
-                                              <object class="GtkLabel" id="DepartmentFromLabel1">
+                                              <object class="GtkLabel" id="DepartmentFromLabel">
                                                 <property name="visible">True</property>
                                                 <property name="label" translatable="yes">Desde</property>
                                               </object>
@@ -670,9 +721,12 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkComboBoxEntry" id="DepartmentFromComboboxentry1">
+                                              <object class="GtkComboBoxEntry" id="DepartmentFromComboboxentry">
                                                 <property name="height_request">22</property>
                                                 <property name="visible">True</property>
+                                                <property name="model">DepartmentComboListStore</property>
+                                                <property name="active">1</property>
+                                                <property name="text_column">1</property>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -681,7 +735,7 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkLabel" id="DepartmentToLabel1">
+                                              <object class="GtkLabel" id="DepartmentToLabel">
                                                 <property name="visible">True</property>
                                                 <property name="label" translatable="yes">Hasta</property>
                                               </object>
@@ -690,9 +744,12 @@
                                               </packing>
                                             </child>
                                             <child>
-                                              <object class="GtkComboBoxEntry" id="DepartmentToComboboxentry1">
+                                              <object class="GtkComboBoxEntry" id="DepartmentToComboboxentry">
                                                 <property name="height_request">22</property>
                                                 <property name="visible">True</property>
+                                                <property name="model">DepartmentComboListStore</property>
+                                                <property name="active">1</property>
+                                                <property name="text_column">1</property>
                                               </object>
                                               <packing>
                                                 <property name="expand">False</property>
@@ -708,7 +765,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkCheckButton" id="DepartmentSubtotalsCheckbutton1">
+                                          <object class="GtkCheckButton" id="DepartmentSubtotalsCheckbutton">
                                             <property name="label" translatable="yes">Generar subtotales por Departamento</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
@@ -753,7 +810,7 @@
                                         <property name="n_rows">2</property>
                                         <property name="n_columns">2</property>
                                         <child>
-                                          <object class="GtkCalendar" id="DateFromCalendar1">
+                                          <object class="GtkCalendar" id="DateFromCalendar">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="year">2010</property>
@@ -768,7 +825,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkCalendar" id="DateToCalendar1">
+                                          <object class="GtkCalendar" id="DateToCalendar">
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="year">2010</property>
@@ -785,7 +842,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkLabel" id="DateFromLabel1">
+                                          <object class="GtkLabel" id="DateFromLabel">
                                             <property name="visible">True</property>
                                             <property name="label" translatable="yes">Desde</property>
                                           </object>
@@ -794,7 +851,7 @@
                                           </packing>
                                         </child>
                                         <child>
-                                          <object class="GtkLabel" id="DateToLabel1">
+                                          <object class="GtkLabel" id="DateToLabel">
                                             <property name="visible">True</property>
                                             <property name="label" translatable="yes">Hasta</property>
                                           </object>
@@ -865,6 +922,7 @@
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <property name="use_stock">True</property>
+                                <signal name="clicked" handler="on_ReportOKButton_clicked"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

@@ -1,6 +1,6 @@
 PDFLATEX="pdflatex"
 BIBTEX="bibtex"
-CAPITULOS=introduccion.tex procesado.tex aplicaciones.tex resultados.tex gpl.tex cc-by-sa.tex
+CAPITULOS=introduccion.tex procesado.tex aplicaciones.tex resultados.tex gpl.tex cc-by-sa.tex resumen-cc.tex resumen-mem.tex
 BIBLIO=biblio
 DIAGRAMAS=diagramas/*.tex
 #IMAGENES=imagenes/*.jpg

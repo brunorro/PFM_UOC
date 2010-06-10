@@ -5,10 +5,14 @@ from CaptureDevice import *
 from MainWindow import *
 from PreferencesDialog import *
 from Configuration import *
+from FaceSignature import *
 
 class Reconocedor:
 	
 	def __init__(self):
+
+		self.faceSign = FaceSignature()
+		self.faceSignAux = FaceSignature()
 
 		self.config = Configuration("./resources/prueba.xml")
 		self.prefDialog = PreferencesDialog(self.config)

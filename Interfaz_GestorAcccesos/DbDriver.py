@@ -15,6 +15,10 @@ class DbDriver:
 	def getEmployeeList(self):
 		return self.driver.getEmployeeList()
 
+	def getDepartmentList(self):
+		return self.driver.getDepartmentList()
+
+
 	def getEmployeeData(self, employeeID):
 		return self.driver.getEmployeeData(employeeID)
 
@@ -29,6 +33,11 @@ class DbDriver:
 				returnList[i>>1][2]=row[2]
 				returnList[i>>1][3]=returnList[i>>1][2]-returnList[i>>1][1]
 			i+=1
+		return returnList
+
+	def getReport(self, employeeIdFrom, employeeIdTo, departmentFrom, departmentTo, dateFrom, dateTo):
+		returnList = self.driver.getReport(employeeIdFrom, employeeIdTo, departmentFrom, departmentTo, dateFrom, dateTo)
+		print returnList
 		return returnList
 			
 

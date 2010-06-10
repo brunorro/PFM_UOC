@@ -61,10 +61,6 @@ class Configuration:
 
 							if dbConfigNode.childNodes[0].nodeType == dbConfigNode.childNodes[0].TEXT_NODE:
 								self.dbParams.append([str(dbConfigNode.attributes.item(i).value),str(dbConfigNode.childNodes[0].data)])
-			print self.dbType
-			for param in self.dbParams:
-				print "\t"+param[0] +"\t\t"+ param[1]
-
 			
 		#except:
 		#	print "Database section doesn't exist in the XML config file"

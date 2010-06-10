@@ -181,4 +181,10 @@ class CaptureDevice:
 		self.getFaceLocations()
 		return self.faceLocationList
 
+	def getScaledFaceImage(self):
+		if len(self.faceLocationList)>0:
+			imgReturn = cvCreateImage(cvSize(128,128), IPL_DEPTH_8U, 1)
+			cvResize(cvGetSubRect(self.grayframe, cvRect(self.faceLocationList[0][0], self.faceLocationList[0][1], \
+					self.faceLocationList[0][4], self.faceLocationList[0][5])), imgReturn)
+			return imgReturn
 		

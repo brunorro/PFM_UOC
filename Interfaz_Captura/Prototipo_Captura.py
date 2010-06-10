@@ -5,13 +5,16 @@ from CaptureDevice import *
 from MainWindow import *
 from PreferencesDialog import *
 from Configuration import *
+from FaceSignature import *
 
-class Reconocedor:
+class Capturador:
 	
 	def __init__(self):
 
 		self.config = Configuration("./resources/prueba.xml")
 		self.prefDialog = PreferencesDialog(self.config)
+
+		self.faceSign = FaceSignature()
 
 		self.captureDevice= CaptureDevice(self)
 		self.MW = MainWindow(self)
@@ -44,4 +47,4 @@ class Reconocedor:
 		gtk.main_quit()
 
 if __name__=="__main__":
-	r  = Reconocedor()
+	c  = Capturador()

@@ -19,7 +19,7 @@
 \begin{document}
 
 \frontmatter
-\title {Control de accesos a partir de rasgos faciales \\ \Large{Memoria del Proyecto} }
+\title {Control de accesos a partir de rasgos faciales \\ \Large{Memoria del Proyecto} \\ PFM1 - Entrega del primer semestre}
 \author {A. Bruno Rodríguez Rodríguez \\ \normalsize{Máster oficial en Software libre - Universitat Oberta de Catalunya}}
 \date{}
 
@@ -31,6 +31,7 @@
 	\textsc{\LARGE Universitat oberta de Catalunya}\\[2cm]
 
 	\textsc{\Huge Proyecto final de máster}\\[1cm]
+	\textsc{\large PFM 1 - Entrega de primer semestre}\\[1cm]
 
  	% Title
 	\HRule \\[1cm]
@@ -63,8 +64,13 @@
 \end{center}
 \end{titlepage}
 
-%\maketitle
+\newpage{\pagestyle{empty}\cleardoublepage}
+\include{resumen-cc}
 
+\newpage{\pagestyle{empty}\cleardoublepage}
+\include{resumen-mem}
+
+%\maketitle
 \setcounter{tocdepth}{3}
 % Numerem fins a la subsecció
 \setcounter{secnumdepth}{3}
@@ -87,6 +93,7 @@
 %% Apéndices
 \appendix
 \chapter{Licencia de la memoria}
+\label{app:docLicense}
 \include{cc-by-sa}
 
 \chapter{Licencia del código}

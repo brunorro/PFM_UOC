@@ -2,7 +2,6 @@
 import sys, time
 
 from Exceptions import *
-from CaptureDevice import *
 
 try:
 	from opencv import cv,highgui
@@ -19,8 +18,12 @@ except:
 class MainWindow():
 
 	def __init__ (self, parentClass):
+
 		self.parentClass = parentClass
 		self.captureDevice = self.parentClass.captureDevice
+
+		self.faceSign = self.parentClass.faceSign
+		self.faceSignAux = None
 
 		self.builder = gtk.Builder()
 		self.builder.add_from_file("./resources/MainWindow.glade")
@@ -60,6 +63,15 @@ class MainWindow():
 
 			if len(faces)>0:
 				self.mainStatusbar.push(0,"Individuo detectado")
+				self.faceSign.setFromImage(self.captureDevice.getScaledFaceImage())
+
+				if self.faceSignAux != None:
+					print self.faceSign.compareSignatureEuc(self.faceSignAux)
+				else :
+					self.faceSignAux = self.parentClass.faceSignAux
+				self.faceSignAux.setFromImage(self.captureDevice.getScaledFaceImage())
+				#self.faceSign.saveSignature("fs_prueba")
+
 				#self.mainTextbuffer.insert_at_cursor("Individuo detectado\n")
 				self.mainTextview.scroll_to_mark(self.mainTextbuffer.get_insert(),0.0)
 			else:

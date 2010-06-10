@@ -9,7 +9,7 @@ En la realización del proyecto se tomarán las siguientes consideraciones:
 	\item{Se debe de tener en cuenta que el sistema reconoce fotografías de individuos puestas frente a la cámara como tales. Habría que mantener algún tipo de control sobre este problema.}
 \end{itemize}
 	
-Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo sistema electrónico. La previsión de ellos incrementa el coste de implantación, a costa de mejorar la disponibilidad en todos los aspectos:
+Asimismo, también tenemos que tener en cuenta los problemas inherentes a todo sistema electrónico. La previsión de ellos incrementa el coste de implantación, a costa de mejorar la disponibilidad en todos los aspectos\cite{hiAvailability}:
 \begin{itemize}
 	\item{Fallos hardware (por desgaste). Para prevenir estos problemas, se debería replicar los componentes hardware que tengan posibilidad de fallo para dotar de alta disponibilidad a la infraestructura}
 	\begin{itemize}
@@ -104,7 +104,7 @@ La librería opencv dispone de la interfaz highgui que proporciona una capa de a
 %Aplicación 
 
 \subsection{Preprocesado de la imagen}
-Para trabajar con la imagen, lo primero que se hace es un paso del formato BGR que captura la cámara a escala de grises. La imagen resultante pasa de tener 3 canales a un único canal, lo cual hace mucho más eficiente y rápido el procesado de esta (ocupa un tercio del tamaño original en memoria). Para la conversión de color a escala de grises, se emplea normalmente la siguiente fórmula:
+Para trabajar con la imagen, lo primero que se hace es un paso del formato BGR que captura la cámara a escala de grises. La imagen resultante pasa de tener 3 canales a un único canal, lo cual hace mucho más eficiente y rápido el procesado de esta (ocupa un tercio del tamaño original en memoria). Para la conversión de color a escala de grises, se emplea normalmente la siguiente fórmula\cite{RGB2grayscale}:
 \[
 	G_{x,y}= 0.3 * R_{x,y} + 0.59 * G_{x,y} + 0.11 * B_{x,y}
 \]
@@ -122,7 +122,7 @@ Normalmente, $R_{x,y}, G_{x,y}, B_{x,y} \in \mathbb{N}_{0,255}$ y por tanto tamb
 	\label{fig:grayscale_conversion}
 \end{figure}
 
-Asimismo se pueden aplicar con mayor facilidad modificaciones en el histograma. La principal de estas modificaciones aplicadas ha sido la normalización durante varios momentos de la obtención de características. Se procede a explicar aquí qué es la normalización, aunque realmente se aplica en pasos posteriores.
+Asimismo se pueden aplicar con mayor facilidad modificaciones en el histograma. La principal de estas modificaciones aplicadas ha sido la normalización durante varios momentos de la obtención de características. Se procede a explicar aquí qué es la normalización, aunque realmente se aplica en pasos posteriores\cite{histogramEqualization}.
 
 La normalización, ecualización o estiramiento lineal del histograma consiste en ampliar la gama cromática empleada en una imagen hasta ajustarla al número máximo de colores de que puede disponer esta imagen. Supongamos que tenemos una imagen en escala de grises ${X}$ y supongamos que $n_{i} \in \mathbb{N}_{0,255}$ es el número de ocurrencias de un nivel de grises $i$. Tenemos que la probabilidad de que haya un pixel con valor i en la imagen es:
 \[
@@ -142,7 +142,7 @@ La función de distribución acumulativa tiene nos permite hacer su inversa, def
 \]
 Teniendo en cuenta que $T(x)$ nos devolvería los valores en un intervalo $\left[0..1\right]$ debemos interpolar los valores contra el rango $\mathbb{N}_{0,255}$:
 \[
-	y' = y' (\max{x} - min {x}) + min{x}
+	y' = y' (\max{x} - \min {x}) + \min{x}
 \]
 
 \begin{figure}[h!]
@@ -197,7 +197,7 @@ Para la búsqueda de un clasificador correcto para una determinada forma, hay qu
 \subsection{Escalado de la imagen}
 Una vez se ha hallado la ubicación de la cara, se escala el tamaño de ésta para poder estandarizar parte de los procesos. El tamaño que se ha considerado más válido para trabajar es el de 128x128 píxeles, a 1 byte per píxel. En la gran mayoría de las imágenes de los juegos de prueba este tamaño es inferior al detectado, pero en caso de tener que ampliar la imagen se aplicaría un filtro bilinear por la relación calidad/tiempo de ampliación que suele tener.
 
-Un filtro bilinear se encarga de escalar una imagen interpolando los cuatro píxeles más cercanos a la posición futura. En este caso, dado que estamos reduciendo la imagen, se puede considerar una adición de ruido despreciable. Dada la situación de la figura \ref{fig:interp_bilinear}, donde los píxeles los píxeles de la imagen original serían $P(1,1), P(1,2), P(2,1)$ y $P(2,2)$, $d$ la distancia en el eje $y$ del resultado interpolado al píxel original y $d'$ el análogo del anterior en el eje $x$, el valor de $P'(x,y)$ en la imagen interpolada se calcularía según la siguiente fórmula:
+Un filtro bilinear se encarga de escalar una imagen interpolando los cuatro píxeles más cercanos a la posición futura\cite{bilinearInterpolation}. En este caso, dado que estamos reduciendo la imagen, se puede considerar una adición de ruido despreciable. Dada la situación de la figura \ref{fig:interp_bilinear}, donde los píxeles los píxeles de la imagen original serían $P(1,1), P(1,2), P(2,1)$ y $P(2,2)$, $d$ la distancia en el eje $y$ del resultado interpolado al píxel original y $d'$ el análogo del anterior en el eje $x$, el valor de $P'(x,y)$ en la imagen interpolada se calcularía según la siguiente fórmula:
 
 \[ P'(x,y) = P(1,1) (1-d) (1-d')+ P(1,2) d (1-d') + P(2,1) d (1-d') + P(2,2) d d'
 \]
@@ -295,7 +295,7 @@ Léase, que a partir de 1,9143 consideramos la contribución despreciable porque
 	G_{x}(t,f)=\int_{-1.9143}^{+1.9143}{e^{-\pi(\tau-t)^ 2e^{-2\pi jf \tau}}x(\tau)d\tau}
 \]
 Dicha transformada tiene las siguientes propiedades: invertibilidad, linearidad, desplazamiento, modulación, propiedad de integración de potencia, propiedad de suma de energía, propiedad de reducción de propiedad, integrabilidad y recuperabilidad.\\
-Un filtro de Gabor \cite{Lee96imagerepresentation} se podría considerar la aplicación de lo citado previamente al mundo de las señales discretas. Es un filtro lineal empleado en el procesado de imágenes para la detección de esquinas y características. Esta serie de filtros tienen un comportamiento frecuencial y de orientación similar al del córtex visual humano y se consideran particularmente apropiados para representar y discriminar texturas. En el dominio espacial (2 dimensiones) el filtrado de la señal se realiza convolucionándola con el/los correspondiente/s kernel de Gabor. Los kernels de Gabor son una Gaussiana modulada con un plano senoidal, y serían calculados con la siguiente fórmula:
+Un filtro de Gabor \cite{Lee96imagerepresentation} se podría considerar la aplicación de lo citado previamente al mundo de las señales discretas. Es un filtro lineal empleado en el procesado de imágenes para la detección de esquinas y características. Esta serie de filtros tienen un comportamiento frecuencial y de orientación similar al del córtex visual humano\cite{DaugmanCortexReceptors} y se consideran particularmente apropiados para representar y discriminar texturas. En el dominio espacial (2 dimensiones) el filtrado de la señal se realiza convolucionándola con el/los correspondiente/s kernel de Gabor. Los kernels de Gabor son una Gaussiana modulada con un plano senoidal\cite{DaugmanGaborTransforms}, y serían calculados con la siguiente fórmula:
 \[
 g(x,y;\lambda,\theta,\psi,\sigma,\gamma)=e^{-\frac{x'^2+\gamma^2y'^2}{2\sigma^2}}\cos\left(2\pi\frac{x'}{\lambda}+\psi\right)
 \]

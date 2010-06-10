@@ -2,6 +2,7 @@
 """ @package InterfazReconocimiento """
 
 from Exceptions import *
+from FaceSignature import *
 import time
 
 try:
@@ -39,20 +40,6 @@ class CaptureDevice:
 	\param drawFeatures Recuadrar los rasgos encontrados
 	"""
 
-	camera = None
-	cascade = None
-
-	image = None
-	grayframe = None
-	frameWidth = 0
-	frameHeight = 0
-
-	faceLocations = []
-
-	gray=0
-	drawFacebox = 1
-	drawFeatures = 1
-
 	def __init__(self, parentClass):
 		""" Constructora de la clase
 		\param parentClass Clase desde la que es invocada
@@ -63,15 +50,20 @@ class CaptureDevice:
 		\li Inicializa el clasificador en cascada para la deteccion de caracteristicas faciales
 		\li Crea un dispositivo de video para capturar datos desde el 
 		\li Inicializa variables auxiliares de la clase"""
-		#self.camera = None 
-		#self.image = None
-		#self.grayframe = None
-		
-		#self.faceLocationList =[]
 
-		#self.gray = 0
-		#self.drawFacebox = 1
-		#self.drawFeatures = 1
+		self.camera = None
+		self.cascade = None
+
+		self.image = None
+		self.grayframe = None
+		self.frameWidth = 0
+		self.frameHeight = 0
+
+		self.faceLocations = []
+
+		self.gray=0
+		self.drawFacebox = 1
+		self.drawFeatures = 1
 
 
 	def setCaptureParameters(self, captureDeviceNumber, cascadeClassifierFile):
@@ -166,7 +158,7 @@ class CaptureDevice:
 				rectanglePointList.append ([initPointFace, endPointFace])
 
 				if self.drawFeatures:
-					features = self.getFeatures(cvGetSubRect(self.grayframe, cvRect(face[0],face[1],face[4],face[5])))
+					features = getFeatures(cvGetSubRect(self.grayframe, cvRect(face[0],face[1],face[4],face[5])))
 					for feat in features:
 						initPoint = cvPoint(face[0]+feat[0], face[1]+feat[1])
 						endPoint = cvPoint(face[0]+feat[0]+feat[2], face[1]+feat[1]+feat[3])
@@ -188,57 +180,11 @@ class CaptureDevice:
 		Devuelve una lista con la ubicacion de las caras detectadas en la imagen """
 		self.getFaceLocations()
 		return self.faceLocationList
+
+	def getScaledFaceImage(self):
+		if len(self.faceLocationList)>0:
+			imgReturn = cvCreateImage(cvSize(128,128), IPL_DEPTH_8U, 1)
+			cvResize(cvGetSubRect(self.grayframe, cvRect(self.faceLocationList[0][0], self.faceLocationList[0][1], \
+					self.faceLocationList[0][4], self.faceLocationList[0][5])), imgReturn)
+			return imgReturn
 		
-
-	def getFeatures(self, img):
-		""" Obtiene los rasgos de las caras
-
-		\param img Imagen sobre la que detectar los rasgos, normalmente un SubRect.
-
-		Devuelve una lista con la ubicacion de los rasgos (ojos, nariz y boca) detectados en la imagen. El parametro img deberia ser el SubRect de la imagen original en el que se ha detectado una cara. """
-
-		size = cvGetSize(img)
-		width = size.width
-
-		size_2 = width >> 1
-		size_4 = width >> 2
-		size_8 = width >> 3
-		size_16 = width >> 4
-		size_32 = width >> 5
-
-		hwindow = size_8+size_16
-		w_eye_window = size_4+size_32
-
-		imgY=cvCreateImage(cvSize(width, width), 8, 1)
-		cvSobel(img, imgY, 0, 1, 3) 
-
-		ojo_d = self.__franjaMax(imgY,hwindow, w_eye_window, width/6, width/6, size_2)
-		ojo_i = self.__franjaMax(imgY,hwindow, w_eye_window, size_2+size_16, width/6, size_2)
-		nariz = self.__franjaMax(imgY,hwindow, size_4, size_2 - size_8, size_2, width-width/3.75 )
-		boca = self.__franjaMax(imgY,hwindow, size_2, size_4, nariz[1]+nariz[3], width-size_16)
-
-		return [ojo_d, ojo_i, nariz, boca]
-
-
-	def __franjaMax (self, img, alto, ancho, x_ini, y_ini, y_fin):
-		""" Obtiene la ubicacion de la ventana de valor maximo.
-		\param img Subrectangulo de la imagen sobre el que hallar la ventana
-		\param alto Altura de la ventana
-		\param ancho Anchura de la ventana
-		\param x_ini Posicion X de la ventana
-		\param y_ini Posicion Y inicial de la ventana
-		\param y_fin Posicion Y final de la ventana
-
-		Obtiene la ubicacion de la ventana (franja) de valor maximo de desplazandola en el eje Y en una zona determinada de una imagen """
-		
-		max=0
-		y_max_franja=y_ini
-
-		for i in range(y_ini, y_fin-alto):
-			valor_franja = cvSum(cvGetSubRect(img, cvRect(x_ini,i,ancho,alto)))
-			if valor_franja[0]>=max:
-				max = valor_franja[0]
-				y_max_franja = i
-
-		return x_ini,y_max_franja,ancho,alto
-

@@ -198,15 +198,18 @@ class FaceSignature:
 	def getPixbufSignature(self):
 		imgWidth = self.signRightEye.width+self.signLeftEye.width+self.signNose.width+self.signMouth.width
 		imageSignatures = cvCreateImage(cvSize(imgWidth,self.signMouth.height), IPL_DEPTH_8U, 1)
+		imagePixbuf = cvCreateImage(cvSize(imgWidth,self.signMouth.height), IPL_DEPTH_8U, 3)
+
 		cvCopy(self.signRightEye, cvGetSubRect(imageSignatures, cvRect(0,0,self.signRightEye.width,self.signRightEye.height)))
 		offset = self.signRightEye.width
-		cvCopy(self.signLeftEye, cvGetSubRect(imageSignatures, cvRect(0,0,offset,self.signLeftEye.height)))
+		cvCopy(self.signLeftEye, cvGetSubRect(imageSignatures, cvRect(offset,0,self.signLeftEye.width,self.signLeftEye.height)))
 		offset +=self.signLeftEye.width
-		cvCopy(self.signNose, cvGetSubRect(imageSignatures, cvRect(0,0,offset,self.signNose.height)))
+		cvCopy(self.signNose, cvGetSubRect(imageSignatures, cvRect(offset,0,self.signNose.width,self.signNose.height)))
 		offset +=self.signNose.width
-		cvCopy(self.signMouth, cvGetSubRect(imageSignatures, cvRect(0,0,offset,self.Mouth.height)))
+		cvCopy(self.signMouth, cvGetSubRect(imageSignatures, cvRect(offset,0,self.signMouth.width,self.signMouth.height)))
 
-		return gtk.gdk.pixbuf_new_from_data(imageSignatures.imageData,gtk.gdk.COLORSPACE_RGB,0,8,imageSignatures.width, imageSignatures.height,imageSignatures.widthStep)
+		cvCvtColor(imageSignatures,imagePixbuf ,CV_GRAY2RGB)
+		return gtk.gdk.pixbuf_new_from_data(imagePixbuf.imageData,gtk.gdk.COLORSPACE_RGB,0,8,imagePixbuf.width, imagePixbuf.height,imagePixbuf.widthStep)
 
 
 	def loadSignature(self, fileNames):

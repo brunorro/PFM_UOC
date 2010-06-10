@@ -21,6 +21,7 @@ class MainWindow():
 	def __init__ (self, parentClass):
 		self.parentClass = parentClass
 		self.captureDevice = self.parentClass.captureDevice
+		self.faceSign = self.parentClass.faceSign
 
 		self.builder = gtk.Builder()
 		self.builder.add_from_file("./resources/MainWindow.glade")
@@ -31,6 +32,9 @@ class MainWindow():
 		self.showFeaturesCheckmenuitem = self.builder.get_object("ShowFeaturesCheckmenuitem")
 		self.showFacesCheckmenuitem = self.builder.get_object("ShowFacesCheckmenuitem")
 		self.grayCheckmenuitem = self.builder.get_object("GrayCheckmenuitem")
+
+		self.pb = gtk.gdk.pixbuf_new_from_file("./resources/NoSignature.png")
+		self.featuresDrawingarea = self.builder.get_object("FeaturesDrawingarea")
 
 		self.showFeaturesCheckmenuitem.set_active(self.parentClass.config.recoPreferences['ShowFeatures'])
 		self.showFacesCheckmenuitem.set_active(self.parentClass.config.recoPreferences['ShowFaces'])
@@ -47,24 +51,22 @@ class MainWindow():
 	def on_PreferencesImagemenuitem_activate(self,widget):
 		self.parentClass.openPreferencesDialog()
 
-#	def set_original_size(self, widget):
-#		self.MainImage.window.resize(640,480)
-
 	def on_MainDrawingarea_expose_event(self, widget, data):
 		
 		[img_width,img_height] = self.mainImage.window.get_size()
+		[sign_width, sign_height] = self.featuresDrawingarea.window.get_size()
+
 		if self.captureDevice!=None:
 			faces = self.captureDevice.getFaces()
 
 			if len(faces)>0:
 				self.mainStatusbar.push(0,"Individuo detectado")
+				self.faceSign.setFromImage(self.captureDevice.getScaledFaceImage())
+				self.featuresDrawingarea.window.draw_pixbuf(None, (self.faceSign.getPixbufSignature()).scale_simple(img_width, sign_height, gtk.gdk.INTERP_BILINEAR),0,0,0,0)
+				
 			else:
+				self.featuresDrawingarea.window.draw_pixbuf(None, self.pb.scale_simple(img_width, sign_height, gtk.gdk.INTERP_BILINEAR),0,0,0,0)
 				self.mainStatusbar.push(0,"")
-			#if time.time()-self.initTime >= 30.0:
-			#	self.redrawCounter = 0
-			#	self.initTime=time.time()
-			#else:
-			#	self.redrawCounter+=1
 
         		self.mainImage.window.draw_pixbuf(None,(self.parentClass.captureDevice.getPixbuf()).scale_simple(img_width, img_height,gtk.gdk.INTERP_NEAREST),0,0,0,0)
 			self.mainImage.queue_draw()

@@ -19,15 +19,16 @@ class MainWindow:
 		self.window = self.builder.get_object("MainWindow")
 		self.__getWidgets()
 		self.__initSectionsTree()
-		
+		self.__refreshEmployeeComboListStore()
+		self.__refreshDepartmentComboListStore()
+
 		self.builder.connect_signals(self)
 
 	def on_MainWindow_destroy(self, widget, data=None):
 		self.mainClass.quit()
 
 	def on_MainImagemenuitemQuit_activate(self, widget, data=None):
-		self.reportDialog.show()
-		#self.mainClass.quit()
+		self.mainClass.quit()
 
 	def __getWidgets(self):
 		self.mainStatusbar = self.builder.get_object("MainStatusbar")
@@ -45,6 +46,23 @@ class MainWindow:
 		self.employeeMailEntry = self.builder.get_object("EmployeeMailEntry")
 		self.employeeAccessListStore = self.builder.get_object("EmployeeAccessListStore")
 
+		self.fromEmployeeComboboxentry= self.builder.get_object("FromEmployeeComboboxentry")
+		self.toEmployeeComboboxentry= self.builder.get_object("ToEmployeeComboboxentry")
+		self.whereEmployeeComboboxentry= self.builder.get_object("WhereEmployeeComboboxentry")
+
+		self.departmentFromComboboxentry = self.builder.get_object("DepartmentFromComboboxentry")
+		self.departmentToComboboxentry = self.builder.get_object("DepartmentToComboboxentry")
+
+		self.departmentComboListStore = self.builder.get_object("DepartmentComboListStore")
+		self.employeeComboListStore = self.builder.get_object("EmployeeComboListStore")
+                self.whereEmployeeComboListStore = self.builder.get_object("WhereEmployeeComboListStore")
+
+		self.dateFromCalendar = self.builder.get_object("DateFromCalendar")
+		self.dateToCalendar = self.builder.get_object("DateToCalendar")
+
+                self.whereHoursEntry = self.builder.get_object("WhereHoursEntry")
+
+
 	def __initSectionsTree(self):
 		employeeParentEntry = self.sectionTreestore.append(None,["Empleados", -1])
 		employeeReportsEntry = self.sectionTreestore.append(None,["Listados", -2])
@@ -57,6 +75,26 @@ class MainWindow:
 		self.sectionTreestore.append(employeeReportsEntry, ["Ultimo dia", 0])
 		self.sectionTreestore.append(employeeReportsEntry, ["Ultima semana", 0])
 		self.sectionTreestore.append(employeeReportsEntry, ["Acumulado por tiempo", 0])
+
+	def __refreshEmployeeComboListStore(self):
+		self.employeeComboListStore.clear()
+		employeeList = self.mainClass.dbDriver.getEmployeeList()
+
+		for row in employeeList:
+			self.employeeComboListStore.append([row[0], "%s, %s" % (row[5], row[4])])
+
+		self.fromEmployeeComboboxentry.set_active(0)
+		self.toEmployeeComboboxentry.set_active(len(employeeList)-1)
+
+	def __refreshDepartmentComboListStore(self):
+		self.departmentComboListStore.clear()
+		departmentList = self.mainClass.dbDriver.getDepartmentList()
+
+		for row in departmentList:
+			self.departmentComboListStore.append([row[0], row[2]])
+
+		self.departmentFromComboboxentry.set_active(0)
+		self.departmentToComboboxentry.set_active(0)
 
 
 	def on_treeview_button_press_event(self,treeview,path,column):
@@ -101,6 +139,47 @@ class MainWindow:
 			self.employeeAccessListStore.append([row[0], time.ctime(row[1]), exitTime, difference])
 
 		return 1
+
+	def on_WhereEmployeeComboboxentry_changed(self, widget, data=None):
+		whereOption = self.whereEmployeeComboboxentry.get_active_iter()
+
+		if self.whereEmployeeComboListStore.get_value(whereOption,0)==-1:
+			self.whereHoursEntry.set_property("editable", False)
+		else :
+			self.whereHoursEntry.set_property("editable", True)
+
+	def on_WhereHoursEntry_changed(self, widget, data=None):
+		data = self.whereHoursEntry.get_text()
+		try:
+			x=(int(data))
+		except:
+			self.whereHoursEntry.set_text("")
+
+	def on_ReportOKButton_clicked(self, widget, data=None):
+		iterAux = self.fromEmployeeComboboxentry.get_active_iter()
+		if iterAux!=None: employeeIdFrom = self.employeeComboListStore.get_value(iterAux,0)
+		else: employeeIdFrom = None
+
+		iterAux = self.toEmployeeComboboxentry.get_active_iter()
+		if iterAux!=None: employeeIdTo = self.employeeComboListStore.get_value(iterAux,0)
+		else: employeeIdTo = None
+
+		iterAux = self.departmentFromComboboxentry.get_active_iter()
+		if iterAux!=None: departmentIdFrom = self.departmentComboListStore.get_value(iterAux,0)
+		else: departmentIdFrom = None
+
+		iterAux = self.departmentToComboboxentry.get_active_iter()
+		if iterAux!=None: departmentIdTo = self.departmentComboListStore.get_value(iterAux,0)
+		else: departmentIdTo = None
+
+		iterAux = self.whereEmployeeComboboxentry.get_active_iter()
+		if iterAux!=None: employeeWhere = self.whereEmployeeComboListStore.get_value(iterAux,0)
+		else: employeeWhere = None
+
+		dateFrom = self.dateFromCalendar.get_date()
+		dateTo = self.dateToCalendar.get_date()
+
+		self.mainClass.dbDriver.getReport(employeeIdFrom, employeeIdTo, departmentIdFrom, departmentIdTo, dateFrom, dateTo)
 
 	def on_EmployeeButtonModify_clicked(self, widget, data=None):
 		self.mainStatusbar.push(0, "Boton modificar pulsado")

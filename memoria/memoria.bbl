@@ -1,5 +1,34 @@
 \begin{thebibliography}{1}
 
+\bibitem{RGB2grayscale}
+{\em PostScript Language Reference Manual}, Reading, Mass., 1994.
+
+\bibitem{FRRstatistics}
+{\sc R.~M. Bolle, S.~Pankanti, and N.~K. Ratha}, {\em Evaluation techniques for
+  biometrics-based authentication systems (frr)}, in ICPR, 2000, pp.~Vol II:
+  831--837.
+
+\bibitem{DaugmanGaborTransforms}
+{\sc J.~Daugman}, {\em Complete discrete 2-{D} gabor transforms}, IEEE Trans.
+  Acoust. Speech Signal Process., 36, pp.~1169--1179.
+\newblock n.
+
+\bibitem{DaugmanCortexReceptors}
+{\sc J.~G. Daugman}, {\em Two-dimensional spectral analysis of cortical
+  receptive field profiles}, Vision Research, 20 (1980), pp.~847--856.
+
+\bibitem{hiAvailability}
+{\sc J.~Gray and D.~P. Siewiorek}, {\em High-availability computer systems},
+  IEEE Computer, 24 (1991), pp.~39--48.
+
+\bibitem{bilinearInterpolation}
+{\sc R.~Harvey, S.~King, R.~Aldridge, and J.~A. Bangham}, {\em Comparing image
+  resamplers via a model of the human vision system}, Oct.~27 1997.
+
+\bibitem{histogramEqualization}
+{\sc R.~A. Hummel}, {\em Image enhancement by histogram transformation},
+  Computer Graphics Image Processing, 6 (1977), pp.~184--195.
+
 \bibitem{Lee96imagerepresentation}
 {\sc T.~S. Lee}, {\em Image representation using 2d gabor wavelets}, IEEE
   Trans. Pattern Analysis and Machine Intelligence, 18 (1996), pp.~959--971.

@@ -189,9 +189,8 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkImage" id="FeaturesImage">
+                              <object class="GtkDrawingArea" id="FeaturesDrawingarea">
                                 <property name="visible">True</property>
-                                <property name="stock">gtk-missing-image</property>
                               </object>
                               <packing>
                                 <property name="position">1</property>
