@@ -231,11 +231,15 @@ Una vez disponemos de la cara ya escalada en BN, se llevan a cabo dos procesos:
 	\item{Sobre el resultado previo aplicamos un algoritmo de ventana para hallar la ubicación de los ojos, la nariz y la boca.}
 \end{itemize}
 
-El detector de esquinas Sobel es muy conocido en el procesado de imagen y es relativamente rápido\footnote{Gracias a las mejoras del hardware actual (mayores anchos de banda de memoria, extensiones para el cálculo vectorial, cachés mayores, varios núcleos para paralelizar procesos...) la velocidad del procesado de imágenes ha mejorado exponencialmente. }. Informalmente, el Sobel halla los bordes de la imagen calculando una aproximación a la derivada de ésta, donde los máximos son el lugar donde hay un cambio en la imagen. En este proyecto utilizamos la convolución de la imagen con el siguiente kernel (informalmente, superponemos cada punto de la imagen con la siguiente matriz):
+El detector de esquinas Sobel es muy conocido en el procesado de imagen\cite{opencv} y es relativamente rápido\footnote{Gracias a las mejoras del hardware actual (mayores anchos de banda de memoria, extensiones para el cálculo vectorial, cachés mayores, varios núcleos para paralelizar procesos...) la velocidad del procesado de imágenes ha mejorado exponencialmente. }. Informalmente, el Sobel halla los bordes de la imagen calculando una aproximación a la derivada de ésta, donde los máximos son el lugar donde hay un cambio en la imagen. En este proyecto utilizamos la convolución de la imagen con el siguiente kernel (informalmente, superponemos cada punto de la imagen con la siguiente matriz):
 
 \[ \frac{\partial^{2}{M}}{\partial{y^{2}}} \approx S_{y}''= \left( \begin{array}{ccc} 1 & 2 & 1 \\ -2 & -4 & -2 \\ 1 & 2 & 1  \end{array} \right) \oplus M \]
 
 Donde $\oplus$ es el operador de convolución. Concretamente, este es un kernel de apertura 3 (tamaño 3x3), para el cálculo de la segunda derivada en el eje Y. Nótese que en el proyecto únicamente se ha utilizado el kernel para calcular la derivada vertical, dado que con él hemos obtenido mejores resultados que calculando la derivada en ambos ejes\footnote{Como comentario, el kernel con el que debería de convolucionarse la imagen para el cálculo de la segunda derivada horizontal sería el resultante de la trasposición del kernel aquí aplicado.}.
+
+Añadir que dado que el kernel es separable (existen $M$ y $N$ tales que $MN=S$) para optimizar el número de operaciones se puede realizar la convolución según la siguiente operación:
+
+\[G_{x}=\left[ \begin{array}{c} 1 \\ -2 \\1 \end{array} \right] \oplus \left( \left[ \begin{array}{ccc} 1 & 2 & 1 \end{array}\right] \oplus M \right) \]
 
 \begin{figure}[h!]
 	\centering
