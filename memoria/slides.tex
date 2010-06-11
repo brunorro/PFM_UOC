@@ -1,0 +1,250 @@
+\documentclass[slidestop,usepdftitle=false]{beamer}
+\usepackage[accumulated]{beamerseminar}
+\usepackage{beamertexpower}
+\usepackage{beamerthemeMadrid}
+\usepackage{geometry}
+\geometry{a6paper,landscape}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage{multirow}
+
+\author[Bruno Rodríguez]{A. Bruno Rodríguez Rodríguez}
+\institute[UOC]{Universitat oberta de Catalunya}
+\title[PFM1]{Reconocimiento facial}
+
+\begin{document}
+
+\begin{slide}
+\maketitle
+\newslide
+\tableofcontents
+\end{slide}
+
+\section{Introducción}
+\subsection{Marco de trabajo}
+\frame{
+	\frametitle{Objetivos}
+	\begin{slide}
+	El objetivo principal del proyecto es la implementación de un sistema de reconocimiento biométrico a partir de los rasgos faciales. Se hace con las siguientes premisas:
+
+		\begin{itemize}
+			\item{\textbf{Sencillez}: La cara normalmente suele ser una región del cuerpo expuesta a la vista.}
+			\item{\textbf{Economía de componentes/uso}: El sistema puede desarrollarse sobre plataformas económicas. }
+			\item{\textbf{Extensibilidad}: Se ha buscado modularidad y extensibilidad durante el desarrollo. }
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Biometría}
+
+	\begin{slide}
+	La biometría consiste en el reconocimiento de individuos a partir de una o varias características físicas de su cuerpo. La eleccción del rostro como medida biométrica tiene ventajas e inconvenientes.\\[0.25cm]
+	Ventajas:\\
+	\begin{itemize}
+		\item{Sencilla de captar con hardware económico}
+		\item{Comodidad de uso por parte del usuario}
+	\end{itemize}
+	Inconvenientes:\\
+	\begin{itemize}
+		\item{Alta variabilidad de la cara de un mismo individuo}
+		\item{Posible repetición (hermanos gemelos)}
+		\item{Fácil de falsificar (fotografías)}
+	\end{itemize}
+	\end {slide}
+
+}
+
+\subsection{Entorno de trabajo}
+\frame{
+	\frametitle{Software empleado y licencias}
+	\begin{slide}
+
+	El software implementado para el proyecto tiene por licencia GPLv3\\[0.5cm]
+	La documentación (incluída esta presentación) se libera bajo licencia Creative Commons - By - Shared Alike\\[0.5cm]
+	Principalmente se ha utilizado el siguiente software:
+	\begin{itemize}
+			\item{\textbf{Sistema Operativo}: GNU/Linux (GPL)}
+			\item{\textbf{Lenguaje de programación}: Python 2.6 (compatible GPL)}
+			\item{\textbf{Librerías empleadas}: OpenCV (BSD), GTK (GPL) }
+			\item{\textbf{Otros}: \LaTeX{} (GPL), GIMP (GPL), gnuplot (compatible GPL)...}
+	\end{itemize}
+
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Hardware empleado}
+	El hardware empleado ha sido:
+	\begin{slide}
+		\begin{itemize}
+			\item{Un pc doméstico}
+			\item{Una webcam económica}
+		\end{itemize}
+	\end {slide}
+}
+
+\section{Funcionamiento}
+\subsection{Visión global}
+\frame{
+	\frametitle{Esquema de funcionamiento}
+	\begin{slide}
+	\begin{center}
+		\resizebox{5.5cm}{!}{\input{diagramas/pasos_sistema.tex}}
+	\end{center}
+	\end {slide}
+}
+
+\subsection{Localización de región de interés}
+\frame{
+	\frametitle{Clasificadores de Haar}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Clasificadores de Haar}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Localización de rasgos}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Localización de rasgos}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+
+\subsection{Extracción de características}
+\frame{
+	\frametitle{Transformada de Gabor}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Transformada de Gabor}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Formato de signatures}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Formato de signatures}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\subsection{Comparación}
+\frame{
+	\frametitle{Distancia Euclídea}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Distancia XOR/OR}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Distancia AND/OR}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+
+\section{Resultados}
+\subsection{Eficiencia}
+\frame{
+	\frametitle{Eficiencia}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\subsection{Eficiencia}
+\frame{
+	\frametitle{Eficiencia}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\subsection{Tiempos}
+\frame{
+	\frametitle{Tiempos}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\subsection{Recursos}
+\frame{
+	\frametitle{Tiempos}
+	\begin{slide}
+		\begin{itemize}
+			\item{Primer ítem}
+		\end{itemize}
+	\end {slide}
+}
+
+\end{document}
