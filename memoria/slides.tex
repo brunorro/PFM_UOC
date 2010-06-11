@@ -77,22 +77,13 @@
 			\item{\textbf{Otros}: \LaTeX{} (GPL), GIMP (GPL), gnuplot (compatible GPL)...}
 	\end{itemize}
 
-	\end {slide}
-}
+	En cuanto al Hardware empleado ha sido un ordenador doméstico y una webcam económica.
 
-\frame{
-	\frametitle{Hardware empleado}
-	El hardware empleado ha sido:
-	\begin{slide}
-		\begin{itemize}
-			\item{Un pc doméstico}
-			\item{Una webcam económica}
-		\end{itemize}
 	\end {slide}
 }
 
 \section{Funcionamiento}
-\subsection{Visión global}
+\subsection{Visión global del sistema}
 \frame{
 	\frametitle{Esquema de funcionamiento}
 	\begin{slide}
@@ -102,87 +93,242 @@
 	\end {slide}
 }
 
+\subsection{Preprocesado}
+\frame{
+	\frametitle{Paso a escala de grises}
+	\begin{slide}
+		Se trabaja con la imagen en escala de grises para mejores resultados y mayor velocidad. Para cada punto en color RGB se aplica la siguiente función (siendo R,G,B las componentes roja, verde y azul y A la imagen resultado):\\
+		\[ A_{x,y}= 0.3 * R_{x,y} + 0.59 * G_{x,y} + 0.11 * B_{x,y} \]
+
+\begin{figure}[h!]
+        \centering
+        \includegraphics[height=5cm]{imagenes/lena_color_256.jpg}
+        \includegraphics[height=5cm]{imagenes/lena_gray_256.jpg}
+\end{figure}
+
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Ecualización del histograma}
+	\begin{slide}
+		La ecualización del histograma es una transformación lineal de $I$ a $I'$ donde $\max(I')=255$ y $\min(I')=0$ para valores $I_{x,y} \in \left[0\hdots255\right]$. A la derecha, la imagen original y su histograma debajo, a la izquierda, imagen e histograma ecualizados:
+
+		\begin{figure}[h!]
+        		\centering
+		        \includegraphics[height=4cm]{imagenes/lena_gray_256.jpg}
+	        	\includegraphics[height=4cm]{imagenes/lena_gray_256_equalized.jpg}\\
+        		\includegraphics[width=4cm, height=2cm]{imagenes/lena_gray_256_hist.png}
+	        	\includegraphics[width=4cm, height=2cm]{imagenes/lena_gray_256_equalized_hist.png}
+		\end{figure}
+
+	\end {slide}
+}
+
 \subsection{Localización de región de interés}
 \frame{
 	\frametitle{Clasificadores de Haar}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Para localizar la cara en una imagen se han utilizado clasificadores de Haar.}
+			\item{Se basan en el reconocimiento de patrones sobre la integral por zonas de una imagen.}
+			\item{Requieren entrenamiento reconocimiento del mismo patrón en suficientes ($>1000$) imágenes.}
+			\item{Varios ejemplos de patrones son los siguientes: A reconocería bordes verticales, B bordes horizontales, C líneas verticales y D líneas diagonales.}
 		\end{itemize}
+	
+		\begin{center}
+		\resizebox{5.5cm}{!}{\input{diagramas/clasificadoresHaar.tex}}
+		\end{center}
+
 	\end {slide}
 }
 
 \frame{
 	\frametitle{Clasificadores de Haar}
 	\begin{slide}
+	\begin{figure}[!hbt]
+		\centering
+		\includegraphics[width=6cm]{imagenes/PrototipoReconocimiento.png}
+		\caption{Ejemplo de detección con clasificadores de Haar}
+	\end{figure}
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Escalado de imagen}
+	\begin{slide}
+		Se redimensiona la imagen en escala de grises para
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Trabajar con imágenes de tamaño homogéneo, en este caso, 128x128 píxeles. }
+			\item{Tener un control sobre el tamaño de las muestras}
 		\end{itemize}
+		Se utiliza el algoritmo de escalado bilineal, en el que cada píxel toma un valor interpolado de sus tres vecinos.\\
+
+		\begin{figure}[!hbt]
+			\centering
+			\resizebox{8cm}{!}{\input{diagramas/interp_bilinear.tex}}
+		\end{figure}
 	\end {slide}
 }
 
 \frame{
 	\frametitle{Localización de rasgos}
 	\begin{slide}
+	Para encontrar los rasgos (ojo derecho, ojo izquierdo, nariz y boca) de la cara:
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Aplicamos un Sobel (segunda derivada) en sentido Y sobre la imagen}
+			\item{Se busca la ventana de valor máximo para cada rasgo según la siguiente imagen.}
 		\end{itemize}
+
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[height=6cm]{imagenes/zonas_busqueda_cara.png}
+		\end{figure}
 	\end {slide}
 }
 
 \frame{
 	\frametitle{Localización de rasgos}
 	\begin{slide}
-		\begin{itemize}
-			\item{Primer ítem}
-		\end{itemize}
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[height=6cm]{imagenes/ejemplo_imagen_hombre.jpg}
+			\caption{Imagen con la cara detectada. A la derecha, de arriba a abajo, escalado, sobel, resultado de detección y encuadre sobre la imagen escalada.}
+		\end{figure}
+
 	\end {slide}
 }
 
 
 \subsection{Extracción de características}
-\frame{
-	\frametitle{Transformada de Gabor}
-	\begin{slide}
-		\begin{itemize}
-			\item{Primer ítem}
-		\end{itemize}
-	\end {slide}
-}
 
 \frame{
 	\frametitle{Transformada de Gabor}
 	\begin{slide}
+	Un banco de filtros de Gabor es una herramienta de análisis frecuencial para:
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Emula el comportamiento de las células del córtex cerebral que se encargan de la visión}
+			\item{Es un banco de kernels resultantes de convolucionar una gaussiana y un plano senoidal orientado con un ángulo $\psi$}
+			\item{Filtra la respuesta frecuencial convolucionando los kernels anteriores con la imagen}
 		\end{itemize}
+
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[height=11cm, angle=90]{imagenes/Gabor.png}
+		\end{figure}
+
 	\end {slide}
 }
 
 \frame{
-	\frametitle{Formato de signatures}
+	\frametitle{Transformada de Gabor}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Se ha aplicado una transformada de Gabor con kernel de tamaño 9 e inclinaciones $\psi \in 0\hdots180\mod{10}=0$}
+			\item{Tras la aplicación, existen dos maneras de almacenar el resultado de los bancos de filtros: Concatenados y superpuestos.}
+			\item{Se usarán los siguientes rasgos para mostrar un ejemplo de cada uno:}
 		\end{itemize}
+
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[width=12cm]{imagenes/M2_concat.jpg}
+		\end{figure}
+
 	\end {slide}
 }
 
 \frame{
-	\frametitle{Formato de signatures}
+	\frametitle{Concatenación de filtrados}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{El resultado de cada filtrado se concatena al lado del anterior}
+			\item{Mejores resultados en comparación}
+			\item{Incrementa en $|\psi|*r$ (donde $r$ es el ancho del rasgo) el tamaño de la signature y el tiempo necesario para compararla}
+			\item{Tamaño total de signature: $18*\sum_{\forall{r}}W_{r} $ para cada rasgo r}
+			\item{Descartada por tamaño e incompatibilidad en caso de cambio de número de orientaciones}
 		\end{itemize}
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[width=12cm]{imagenes/M2_concat_od_10deg.png}\\
+			\includegraphics[width=12cm]{imagenes/M2_concat_oi_10deg.png}\\
+			\includegraphics[width=12cm]{imagenes/M2_concat_nariz_10deg.png}\\
+			\includegraphics[width=12cm]{imagenes/M2_concat_boca_10deg.png}
+		\end{figure}
+
 	\end {slide}
 }
 
-\subsection{Comparación}
+\frame{
+	\frametitle{Superposición de filtrados}
+	\begin{slide}
+		\begin{itemize}
+			\item{El resultado de cada filtrado se suma ponderadamente}
+			\item{Resultados ligeramente peores en comparación}
+			\item{Para cada rasgo $r$ el tamaño de la signature es el mismo que el del rasgo del que se obtiene}
+			\item{Tamaño total de signature: $\sum_{\forall{r}}W_{r} $ para cada rasgo r}
+			\item{Elegida por la velocidad de comparación, tamaño y relación fiabilidad/tiempos de cómputo}
+		\end{itemize}
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[height=2cm]{imagenes/M2_superpos_od_10deg.png}
+			\includegraphics[height=2cm]{imagenes/M2_superpos_oi_10deg.png} 
+			\includegraphics[height=2cm]{imagenes/M2_superpos_nariz_10deg.png}
+			\includegraphics[height=2cm]{imagenes/M2_superpos_boca_10deg.png}
+		\end{figure}
+
+	\end {slide}
+}
+\frame{
+	\frametitle{Suavizado}
+	\begin{slide}
+		\begin{itemize}
+			\item{El resultado de la superposición de signatures se ha suavizado para mejor respuesta ante oscilaciones (movimientos y similares)}
+			\item{Suavizar una imagen consiste en convolucionar con una gaussiana. En este caso, el kernel con el que se ha convolucionado la imagen ha sido de tamaño 3x3.}
+			\item{En la imagen se puede comprobar a la izquierda, la signature original, y de izquierda a derecha, la suavización con una gaussiana de 3x3, 5x5 y 7x7, respectivamente}
+		\end{itemize}
+
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[height=2cm]{imagenes/suavizado.png}
+		\end{figure}
+
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Binarización}
+	\begin{slide}
+		\begin{itemize}
+			\item{La binarización se define como que por cada píxel de la imagen $I$, con un umbral $T$ y un valor máximo $M$ :
+        		\[thr(I,T,M) = \begin{cases}
+                		0, & \text{si $I_{x,y} < T$}\\
+				M, & \text{si $I_{x,y} \geq T$}
+                        \end{cases} \]}
+
+			\item{Esto hace más cómoda la comparación y nos permitiría almacenar la signature únicamente con dos valores binarios (no se ha podido realizar). El valor de umbral aplicado ha sido $T=16$ y el máximo $M=255$}
+			\item{En la imagen se ve el resultado de binarizar la imagen anterior con valores $T=(0,30,60,90)$ en la primera fila y $T=(120,150,180,210)$ en la segunda}
+			
+		\end{itemize}
+		\begin{figure}[!hbt]
+			\centering
+			\includegraphics[height=3cm]{imagenes/umbral_binarizada.png}
+		\end{figure}
+
+	\end {slide}
+}
+
+\subsection{Comparación entre signatures}
 \frame{
 	\frametitle{Distancia Euclídea}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Es una medida de disimilitud (a mayor valor, menor similitud) entre signatures basada en la distancia euclídea ponderada.}
+			\item{Se calcula según la siguiente fórmula para cada píxel
+				\[ D_{euc}(m,n)=\frac{\sum_{i,j=0}^{X,Y}{\parallel m_{i,j}-n_{i,j}\parallel}}{XY} \]
+				donde $\parallel a-b \parallel$ representa el valor absoluto de la resta $a-b$ y $X,Y$ son el ancho y el alto de la signature, respectivamente}
+			\item{$D_{euc}(m,n)\in\mathbb{R}_{0,255}$, es decir, el resultado de aplicarla es un número real entre 0 y 255, truncable a un valor natural $D_{euc}(m,n)\in\mathbb{N}_{0,255}$ }
+
+			\item{Sencilla y rápida de calcular. Se ha escogido como medida de distancia entre signatures}
 		\end{itemize}
 	\end {slide}
 }
@@ -191,8 +337,14 @@
 	\frametitle{Distancia XOR/OR}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Es una medida de disimilitud entre signatures (a mayor valor, menor similitud) calculada a partir de la división de los sumatorios del resultado de la XOR y la OR de las signatures.}
+			\item{Se calcula según la siguiente fórmula para cada píxel
+				\[ D_{xor}(m,n)=\frac{ \sum_{x,y=0}^{X,Y}(m_{x,y} \oplus n_{x,y}) }{ \sum_{x,y=0}^{X,Y}(m_{x,y} \vee n_{x,y}) } \]
+				donde $X,Y$ es el tamaño de la imagen, $\oplus$ simboliza la XOR bit a bit y $\vee$ simboliza la OR bit a bit de cada píxel de la imagen}
+			\item{El resultado que da está en el rango $D_{xor}(m,n)\in\mathbb{R}_{0,1}$}
+			\item{Funcionamiento correcto, de hecho similar o mejor para filtrados concatenados que la $D_{euc}$}
 		\end{itemize}
+
 	\end {slide}
 }
 
@@ -200,8 +352,14 @@
 	\frametitle{Distancia AND/OR}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{Es una medida de similitud entre signatures (a menor valor, mayor similitud) calculada a partir de la división de los sumatorios del resultado de la AND y la OR de las signatures.}
+			\item{Se calcula según la siguiente fórmula para cada píxel
+				\[ D_{and}(m,n)=\frac{ \sum_{x,y=0}^{X,Y}(m_{x,y} \wedge n_{x,y}) }{ \sum_{x,y=0}^{X,Y}(m_{x,y} \vee n_{x,y})} \]
+				donde $X,Y$ es el tamaño de la imagen, $\wedge$ simboliza la AND bit a bit y $\vee$ simboliza la OR bit a bit de cada píxel de la imagen}
+			\item{El resultado que da pertenece al rango $D_{and}(m,n)\in\mathbb{R}_{0,1}$}
+			\item{Funcionamiento inusualmente correcto, sobretodo para los filtrados superpuestos}
 		\end{itemize}
+
 	\end {slide}
 }
 
@@ -209,21 +367,68 @@
 \section{Resultados}
 \subsection{Eficiencia}
 \frame{
-	\frametitle{Eficiencia}
+	\frametitle{Gráficas TFA/TFE}
 	\begin{slide}
 		\begin{itemize}
-			\item{Primer ítem}
+			\item{La fiabilidad del sistema se mide en gráficas TFA/TFE.}
+			\item{TFA: Tasa de falso acierto (probabilidad de confundir un individuo con otro)}
+			\item{TFE: Tasa de falso error (probabilidad de no reconocer a un individuo dado de alta)}
 		\end{itemize}
+
+		\begin{figure}[!hb]
+		        \centering
+		        \includegraphics[height=6cm]{imagenes/grafica_TFA.png}
+		\end{figure}
+
 	\end {slide}
 }
 
-\subsection{Eficiencia}
 \frame{
-	\frametitle{Eficiencia}
+	\frametitle{Tabla de eficiencia}
 	\begin{slide}
-		\begin{itemize}
-			\item{Primer ítem}
-		\end{itemize}
+		Tras el cálculo de la eficiencia para las variantes aplicadas, se llegó a la conclusión que la mejor opción era el uso de la distancia euclídea con filtrados superpuestos:\\
+	\footnotesize{
+	\begin{tabular}{|l|r|r|r|r|r|}
+	 \hline
+	  Distancia & Rasgo & Umbral & Punto de corte & \%TFA  & \%TFE \\
+	  \hline \hline
+	  \multirow{16}{*}{Euclídea con filtrados superpuestos}
+		& \multirow{4}{*}{Ojo derecho} & 8  & 71.00 & $\approx 25.00$ & $\approx 25.00$ \\
+		& & 16 & 87.00 & $\approx 25.00$ & $\approx 25.00$ \\
+		& & 32 & 86.50 & $\approx 25.00$ & $\approx 25.00$ \\
+		& & 64 & 58.50 & $\approx 30.00$ & $\approx 25.00$ \\ \cline{2-6}
+
+		& \multirow{4}{*}{Ojo izquierdo} & 8  & 70.50 & $\approx 25.00$ & $\approx 25.00$ \\
+		& & 16 & 85.00 & $\approx 20.00$ & $\approx 20.00$ \\
+		& & 32 & 83.00 & $\approx 25.00$ & $\approx 20.00$ \\
+		& & 64 & 55.00 & $\approx 25.00$ & $\approx 25.00$ \\ \cline{2-6}
+
+		& \multirow{4}{*}{Nariz} & 8  & 68.50 & $\approx 35.00$ & $\approx 35.00$ \\
+		& & 16 & 100.50 & $\approx 30.00$ & $\approx 30.00$ \\
+		& & 32 & 100.50 & $\approx 30.00$ & $\approx 30.00$ \\
+		& & 64 & 52.00 & $\approx 35.00$ & $\approx 35.00$ \\ \cline{2-6}
+
+		& \multirow{4}{*}{Boca} & 8  & 94.00 & $\approx 35.00$ & $\approx 35.00$ \\
+		& & 16 & 112.50 & $\approx 35.00$ & $\approx 35.00$ \\
+		& & 32 & 94.50 & $\approx 35.00$ & $\approx 35.00$ \\
+		& & 64 & 48.00 & $\approx 40.00$ & $\approx 40.00$ \\ \hline
+
+	 \end{tabular}
+	}
+
+	\end {slide}
+}
+
+\frame{
+	\frametitle{Gráficas de eficiencia}
+	\begin{slide}
+		Gráficas de eficiencia para filtrados superpuestos, umbral 16 y distancia euclídea. Rasgos: ojo derecho, ojo izquierdo, nariz y boca
+		\begin{center}
+	                \resizebox{6cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_1.tex}}
+        	        \resizebox{6cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_7.tex}}
+	                \resizebox{6cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_13.tex}}
+        	        \resizebox{6cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_19.tex}}
+		\end{center}
 	\end {slide}
 }
 
@@ -231,19 +436,10 @@
 \frame{
 	\frametitle{Tiempos}
 	\begin{slide}
-		\begin{itemize}
-			\item{Primer ítem}
-		\end{itemize}
-	\end {slide}
-}
-
-\subsection{Recursos}
-\frame{
-	\frametitle{Tiempos}
-	\begin{slide}
-		\begin{itemize}
-			\item{Primer ítem}
-		\end{itemize}
+	Tiempos desde que se obtiene la imagen hasta que se tiene la face signature según los procedimientos indicados en el ordenador en el que se ha desarrollado la aplicación:
+	\begin{center}
+		\resizebox{12cm}{!}{\input{diagramas/stats_tiempos/stats_tiempo_total.tex}}
+	\end{center}
 	\end {slide}
 }
 

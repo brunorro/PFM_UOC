@@ -120,8 +120,8 @@ def gaborFilteringConcat(image, kernels):
 		cvCopy(img_aux, cvGetSubRect(img_total,cvRect(i*img_aux.width,0,img_aux.width,img_aux.height)))
 		i+=1
 
-	cvThreshold(img_total, img_total, 16, 255, CV_THRESH_BINARY)
 	cvSmooth(img_total,img_total)
+	cvThreshold(img_total, img_total, 16, 255, CV_THRESH_BINARY)
 
 	return img_total
 
@@ -153,8 +153,8 @@ def gaborFilteringSuperp(image, kernels):
 		cvAdd(img_aux, img_total, img_total)
 		i+=1
 
-	cvThreshold(img_total, img_total, 16, 255, CV_THRESH_BINARY)
 	cvSmooth(img_total,img_total)
+	cvThreshold(img_total, img_total, 16, 255, CV_THRESH_BINARY)
 
 	return img_total
 

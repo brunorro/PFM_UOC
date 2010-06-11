@@ -106,13 +106,13 @@ La librería opencv dispone de la interfaz highgui que proporciona una capa de a
 \subsection{Preprocesado de la imagen}
 Para trabajar con la imagen, lo primero que se hace es un paso del formato BGR que captura la cámara a escala de grises. La imagen resultante pasa de tener 3 canales a un único canal, lo cual hace mucho más eficiente y rápido el procesado de esta (ocupa un tercio del tamaño original en memoria). Para la conversión de color a escala de grises, se emplea normalmente la siguiente fórmula\cite{RGB2grayscale}:
 \[
-	G_{x,y}= 0.3 * R_{x,y} + 0.59 * G_{x,y} + 0.11 * B_{x,y}
+	A_{x,y}= 0.3 * R_{x,y} + 0.59 * G_{x,y} + 0.11 * B_{x,y}
 \]
 \begin{itemize}
-	\item{$G_{x,y}$ es el valor en escala de grises del $(x,y)$ de la imagen }
+	\item{$A_{x,y}$ es el valor en escala de grises del $(x,y)$ de la imagen }
 	\item{$R, G, B$ son las componentes roja, verde y azul, respectivamente, de la imagen original}
 \end{itemize}
-Normalmente, $R_{x,y}, G_{x,y}, B_{x,y} \in \mathbb{N}_{0,255}$ y por tanto también $G_{x,y} \in \mathbb{N}_{0,255}$.
+Normalmente, $R_{x,y}, G_{x,y}, B_{x,y} \in \mathbb{N}_{0,255}$ y por tanto también $A_{x,y} \in \mathbb{N}_{0,255}$.
 
 \begin{figure}[h!]
 	\centering
