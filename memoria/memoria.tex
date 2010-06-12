@@ -16,6 +16,11 @@
 
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
+\def\eup{\,\hbox{\raise .36em\hbox to0pt{\vrule height0.5pt% 
+width.55em depth0pt\hss}% 
+\raise .25em\hbox to0pt{\vrule height0.5pt width.5em% 
+depth0pt\hss}\hskip.02em\sf C}}
+
 \begin{document}
 
 \frontmatter
@@ -84,7 +89,6 @@
 
 \include{introduccion}
 \include{procesado}
-\include{aplicaciones}
 \include{resultados}
 
 \bibliographystyle{siam}
@@ -92,6 +96,8 @@
 
 %% Apéndices
 \appendix
+\include{aplicaciones}
+
 \chapter{Licencia de la memoria}
 \label{app:docLicense}
 \include{cc-by-sa}

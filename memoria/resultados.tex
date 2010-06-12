@@ -21,7 +21,7 @@ Sobre este subconjunto de imágenes se tomarán las estadísticas de calidad de 
 Para el análisis estadístico realizado se han empleado los conceptos definidos a continuación\cite{FRRstatistics}:
 \begin{itemize}
 	\item{La \textbf{tasa de falsa aceptación (TFA)}\footnote{En inglés conocida como \textbf{False acceptation rate (FAR)}.} se define como el porcentaje de muestras en las que se ha extraído un falso positivo o una falsa identificación. La TFA mide la robustez del sistema.}
-	\item{La \textbf{tasa de falso error o rechazo (TFE)}\footnote{En inglés conocida como \textbf{False rejection rate (FRR)}.} se define como el porcentaje de muestras en las que debiendo dar un resultado positivo, se devuelve un resultado negativo. La TFE mide la "comodidad de uso" del sistema en el sentido de que por parte del usuario no sea necesaria mayor interacción de la requerida. }
+	\item{La \textbf{tasa de falso error o rechazo (TFE)}\footnote{En inglés conocida como \textbf{False rejection rate (FRR)}.} se define como el porcentaje de muestras en las que debiendo dar un resultado positivo, se devuelve un resultado negativo. La TFE mide la ``comodidad de uso'' del sistema en el sentido de que por parte del usuario no sea necesaria mayor interacción de la requerida. }
 \end {itemize}
 
 Cuando ambos porcentajes dependen de una variable (supongamos un umbral cualquiera como pueda ser grado de igualdad, tamaño de muestra, etc.) se representan en gráficas TFA/TFE. El punto óptimo de trabajo es aquel en el que se minimiza la TFA mientras la TFE se mantiene en valores aceptables. Sacrificando uno de los dos aspectos se puede adaptar el sistema a otros entornos: para mayor seguridad se puede minimizar la TFA y para que los usuarios no necesiten tomar varias muestras se puede reducir la TFE.
@@ -38,7 +38,7 @@ En este caso, la variable sobre la que se calcula la TFA/TFE es la distancia ent
 	\item{En el eje X tenemos las probabilidades acumuladas (percentiles) de las medidas. En el eje Y tenemos el valor de la distancia para el que tenemos ese percentil. La distancia extragrupo está invertida (1-probabilidad), mientras que la intragrupo está ordenada de manera normal.}
 	\item{El cuadrado azul es el punto bajo el que la $TFA\approx5\%$, lo que quiere decir que todas las muestras que se encuentren a una distancia inferior a la proyección de este sobre el eje Y pertenecerán al mismo individuo.}
 	\item{En la proyección sobre el eje X del punto de cruce (la línea naranja) tenemos la TFA y la TFE de ese punto. La proyección sobre el eje Y nos da el valor de la distancia de corte con la que podemos determinar si un individuo es quien tenemos en la BBDD o no.}
-	\item{La línea naranja que cruza el 'Valor óptimo' con el eje $Y$ es el valor de la distancia donde tenemos una $TFA\approx5\%$\footnote{Aquí se considera $TFA\approx5$ por los efectos de inferencia estadística.}. En este caso, al ser una distancia euclídea (medida de disimilitud) el valor de corte está por debajo\footnote{Si hablamos de una medida de disimilitud (distancia euclídea, distancia xor/or) el valor de corte está por debajo. Si la medida fuese de similitud (distancia and), el valor de corte estaría por encima.} del cual se consideran dos muestras del mismo individuo. }
+	\item{La línea naranja que cruza el ``Valor óptimo'' con el eje $Y$ es el valor de la distancia donde tenemos una $TFA\approx5\%$\footnote{Aquí se considera $TFA\approx5$ por los efectos de inferencia estadística.}. En este caso, al ser una distancia euclídea (medida de disimilitud) el valor de corte está por debajo\footnote{Si hablamos de una medida de disimilitud (distancia euclídea, distancia xor/or) el valor de corte está por debajo. Si la medida fuese de similitud (distancia and), el valor de corte estaría por encima.} del cual se consideran dos muestras del mismo individuo. }
 	\item{El cuadrado verde nos da el rango de posibles valores para ajustar la distancia y con los que obtendríamos mejor o peor TFA o TFE. Por ejemplo, si pusiésemos la distancia de corte en 30, tendríamos aproximadamente una $TFE\approx40\%$ (proyección de la probabilidad intragrupo acumulada sobre el eje X) y una $TFA\approx20\%$ ($(1-P)$ donde $P$ es la proyección de la probabilidad intergrupo sobre el eje X).} 
 \end{itemize}
 
@@ -70,9 +70,21 @@ Para comprobar la fiabilidad y velocidad del sistema, las estadísticas que se h
 			\item{Umbral: Binarización con valores de $T=(8,16,32,64)$}
 		\end{itemize}
 
-	Lo cual nos da un total de 48 gráficas que se muestran a continuación agrupadas por el valor de umbralización. De arriba a abajo y de izquierda a derecha los valores de umbralización son $T=(8,16,32,64)$. 
+	Lo cual nos da un total de 48 gráficas que se muestran agrupadas por el valor de umbralización (de arriba a abajo y de izquierda a derecha los valores de umbralización son $T=(8,16,32,64)$) a partir de la figura \ref{fig:superp-xor-od}, y están resumidos a partir del cuadro \ref{tab:xor_super}.
 	}
-	\item{Tiempos de funcionamiento}
+	\item{Tiempos de funcionamiento\\
+		Se han extraído tiempos de funcionamiento de los siguientes procesos:
+		\begin{itemize}
+			\item{Paso a escala de grises}
+			\item{Localización de cara}
+			\item{Escalado de la imagen}
+			\item{Ecualización de histograma}
+			\item{Localización de rasgos}
+			\item{Extracción de signature}
+			\item{Tiempos totales}
+		\end{itemize}
+		Los tiempos están resumidos en las gráficas a partir de \ref{fig:preproc_times} y están resumidas en el cuadro \ref{tab:stats_time}.
+	}
 
 \end{itemize}
 
@@ -86,8 +98,6 @@ El algoritmo de detección facial mediante clasificadores de Haar es eficiente y
 	\caption{Falso positivo/negativo en detección facial}
 	\label{fig:facial_detection_problems}
 \end{figure}
-
-Los resultados obtenidos son los siguientes:
 
 \begin{table}
 	\centering
@@ -108,11 +118,12 @@ Los resultados obtenidos son los siguientes:
 	\label{tab:face_detection_stats}
 \end{table}
 
-Si consideramos que el juego de pruebas es representativo, la interpretación de estos resultados es claramente positiva. En términos de resultados, los falsos negativos no influyen en el funcionamiento del resto de procesos. Los falsos positivos son más problemáticos porque afectan a la tasa de reconocimiento y al rendimiento del sistema.
+Si consideramos que el juego de pruebas es representativo, la interpretación de estos resultados es claramente positiva. En términos de resultados, los falsos negativos no influyen en el funcionamiento del resto de procesos. Los falsos positivos son más problemáticos porque afectan a la tasa de reconocimiento y al rendimiento del sistema. Los resultados de la detección facial se pueden ver en el cuadro \ref{tab:face_detection_stats}, en la que se puede comprobar que en un 85,77\% de los resultados habremos localizado correctamente el rostro del individuo.
 
 \subsection{Estadísticas de funcionamiento}
 Las estadísticas de calidad de funcionamiento son las más importantes del sistema. En estas, suponiendo que el juego de pruebas es representativo, tenemos un indicador bastante fiable del funcionamiento del sistema. Las gráficas se han extraído con el número de comparaciones que aparece en el cuadro \ref{tab:distance_calc_stats}.
-\begin{table}[!hb]
+
+\begin{table}[!htb]
 	\begin{tabular}{|l|r|r|r|}
 		\hline
 		& Distancia AND/OR & Distancia XOR/OR & Distancia Euclídea \\
@@ -122,15 +133,14 @@ Las estadísticas de calidad de funcionamiento son las más importantes del sist
 		Umbrales de binarización & 8,16,32,64 & 8,16,32,64 & 8,16,32,64 \\
 		Rasgos comparados\tiny{Ojo derecho, ojo izquierdo, nariz y boca.} & 4 & 4 & 4 \\
 		\hline
-		Total de comparaciones intraindividuo & 1039312 & 1039312 & 1039312 \\
-		Total de comparaciones extraindividuo & 188096 & 188096 & 188096 \\
+		Total de comparaciones intraindividuo & 188096 & 188096 & 188096 \\
+		Total de comparaciones extraindividuo & 1039312 & 1039312 & 1039312 \\
 		\hline
 	\end{tabular}
 	\caption{Número de cálculos de distancia realizados}
 	\label{tab:distance_calc_stats}
 \end{table}
 
-%\clearpage
 Las TFA que se han obtenido trabajando con este juego de pruebas y utilizando el sistema descrito han sido demasiado altas para su uso en un entorno de criticidad media o alta. No obstante, el sistema puede mostrar mejores resultados si fijamos las siguientes variables:
 \begin{itemize}
 	\item{Condiciones de luminosidad constantes y regularidad en la toma de imágenes para reducir la TFA.}
@@ -154,7 +164,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_1.tex}}
@@ -164,7 +174,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-xor-od}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_1.tex}}
@@ -176,7 +186,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_7.tex}}
@@ -186,7 +196,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-xor-oi}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_7.tex}}
@@ -198,7 +208,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_13.tex}}
@@ -208,7 +218,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-xor-n}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_13.tex}}
@@ -220,7 +230,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_superp/grafica_19.tex}}
@@ -230,7 +240,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-xor-b}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/xor_concat/grafica_19.tex}}
@@ -242,7 +252,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_1.tex}}
@@ -252,7 +262,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-and-od}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_1.tex}}
@@ -264,7 +274,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_7.tex}}
@@ -274,7 +284,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-and-oi}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_7.tex}}
@@ -286,7 +296,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_13.tex}}
@@ -296,7 +306,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-and-n}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_13.tex}}
@@ -308,7 +318,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_superp/grafica_19.tex}}
@@ -318,7 +328,7 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
         \label{fig:superp-and-b}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/and_concat/grafica_19.tex}}
@@ -330,89 +340,89 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_1.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_2.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_3.tex}}
-        \caption{TFA/TFE usando distancia euclídea (ojo derecho)}
+        \caption{TFA/TFE usando distancia euclídea en superposición (ojo derecho)}
         \label{fig:superp-euc-od}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_0.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_1.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_2.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_3.tex}}
-        \caption{TFA/TFE usando distancia euclídea (ojo derecho)}
+        \caption{TFA/TFE usando distancia euclídea en concatenación (ojo derecho)}
         \label{fig:concat-euc-od}
 \end{figure}
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_7.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_8.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_9.tex}}
-        \caption{TFA/TFE usando distancia euclídea (ojo izquierdo)}
+        \caption{TFA/TFE usando distancia euclídea en superposición (ojo izquierdo)}
         \label{fig:superp-euc-oi}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_6.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_7.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_8.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_9.tex}}
-        \caption{TFA/TFE usando distancia euclídea (ojo izquierdo)}
+        \caption{TFA/TFE usando distancia euclídea en concatenación (ojo izquierdo)}
         \label{fig:concat-euc-oi}
 \end{figure}
 
 \clearpage
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_13.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_14.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_15.tex}}
-        \caption{TFA/TFE usando distancia euclídea (nariz)}
+        \caption{TFA/TFE usando distancia euclídea en superposición (nariz)}
         \label{fig:superp-euc-n}
 \end{figure}
 
-\begin{figure}[!hb]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_12.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_13.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_14.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_15.tex}}
-        \caption{TFA/TFE usando distancia euclídea (nariz)}
+        \caption{TFA/TFE usando distancia euclídea en concatenación (nariz)}
         \label{fig:concat-euc-n}
 \end{figure}
 
 \clearpage 
 
-\begin{figure}[!ht]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_19.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_20.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_superp/grafica_21.tex}}
-        \caption{TFA/TFE usando distancia euclídea (boca)}
+        \caption{TFA/TFE usando distancia euclídea en superposición (boca)}
         \label{fig:superp-euc-b}
 \end{figure}
 
-\begin{figure}[!ht]
+\begin{figure}[!htb]
 	\centering
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_18.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_19.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_20.tex}}
 			\resizebox{7.25cm}{!}{\input{diagramas/stats_eficiencia/euc_concat/grafica_21.tex}}
-        \caption{TFA/TFE usando distancia euclídea (boca)}
+        \caption{TFA/TFE usando distancia euclídea en concatenación (boca)}
         \label{fig:concat-euc-b}
 \end{figure}
 
@@ -422,10 +432,11 @@ A continuación se adjuntan los resultados de las comprobaciones realizadas, a p
 %stats_carga_imagen.tex
 En este proyecto se buscaban tiempos de ejecución moderados-bajos para que el sistema pueda funcionar en tiempo real (o con un retraso aceptable).
 \begin{itemize}
-	\item{Se ha considerado tiempo real que los tiempos de procesado totales permitan 8 cuadros por segundo.}
+	\item{Se ha considerado tiempo real que los tiempos de procesado totales permitan 8 cuadros por segundo con el hardware empleado.}
 	\item{El hardware sobre el que se han ejecutado las pruebas está detallado en la sección \ref{sec:cost_estimation} y se dan detalles sobre el dispositivo de captura empleado en la sección \ref{sec:capture_device}, siendo la figura \ref{fig:webcam} una foto de ésta.}
 	\item{El juego de pruebas empleado tenía fotos de tamaño superior (896x592) a las imágenes obtenidas vía webcam (640x480). Esto debería dar un margen de error positivo en cuanto al procesado de la imagen.}
 	\item{El tiempo de acceso al disco puede ser inferior al tiempo de captura de imagen desde la webcam, debido a que esta comparte la controladora USB con más dispositivos.}
+	\item{Los detalles sobre el hardware empleado se muestran en el cuadro \ref{tab:hardware_details}}
 \end{itemize}
 
 Entrando de lleno en el procesado del sistema se ha visto el siguiente comportamiento:
@@ -537,4 +548,37 @@ Por el trabajo realizado, se han estimado los siguientes costes, en horas lineal
 	\label{tab:project_hours}
 \end{table}
 
-\subsection{Costes de instalación y mantenimiento del hardware.}
+\subsection{Costes de hardware y Sistema operativo.}
+
+El hardware sobre el que se ha desarrollado el sistema y sobre el que se han tomado las estadísticas es el siguiente:
+
+\begin{table}[!htb]
+	\begin{tabular}{|l|p{3cm}|p{4cm}|r|r|}
+		\hline
+		Componente & Descripción & Especificaciones & Cantidad x Coste & Total \\
+		\hline
+		CPU & AMD Athlon(tm) 64 X2 6000+ & Dual core, 256 KB Cache L1,  2 x 1MB Cache L2 & 1 x 80 \eup & 80 \eup\\
+		\hline
+		Memoria & Kingston 2 GB DDR2 & FSB 400 MHz (latencia 2.5 ns) funcionando en dual channel (FSB 800 MHz, misma latencia) & 2 (4GB) x 50 \eup & 100 \eup \\
+		\hline
+		Placa base & Asrock ALiveNF7G-FullHD & Chipset nvidia nForce 630A, 256 MB de memoria gráfica compartida, Ethernet integrada, SATA II & 1 x 45 \eup & 45 \eup \\
+		\hline
+		Disco duro & Seagate ST3500320AS & 500 GB de capacidad, SATA II & 1 x 50 \eup & 50 \eup \\
+		\hline
+		Webcam & UVC Camera (eb1a:2571) & Con micrófono incluído & 1 x 15 \eup & 15 \eup \\
+		\hline
+		\textbf{TOTAL} & & & &  290 \eup \\
+		\hline
+	\end{tabular}
+	\caption{Detalles del hardware empleado}
+	\label{tab:hardware_details}
+\end{table}
+
+Detalles a tener en cuenta:
+\begin{itemize}
+	\item{Los 4 GB de RAM en verdad son 4096MB - 256MB = 3840MB, debido a los 256 de la tarjeta gráfica.}
+	\item{El equipo tiene una fuente de alimentación de 450 Watts, aunque en raras ocasiones sobrepasa los 250 Watts de consumo.}
+	\item{Se ha evitado hacer mención de otro hardware instalado en el equipo (sintonizadora de TDT y tarjeta de sonido no integrada en placa base).}
+\end{itemize}
+
+En cuanto al sistema operativo, se ha empleado un Ubuntu 9.10 con kernel linux-image-2.6.31-22-generic. Al no necesitar soporte para dicho sistema operativo, el coste se puede considerar 0 \eup.

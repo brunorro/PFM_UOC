@@ -1,7 +1,10 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{RGB2grayscale}
 {\em PostScript Language Reference Manual}, Reading, Mass., 1994.
+
+\bibitem{opencv}
+{\em OpenCV Reference Manual}, Santa Clara, California, 1999-Today.
 
 \bibitem{FRRstatistics}
 {\sc R.~M. Bolle, S.~Pankanti, and N.~K. Ratha}, {\em Evaluation techniques for
