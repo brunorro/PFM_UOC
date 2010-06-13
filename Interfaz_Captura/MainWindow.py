@@ -33,6 +33,8 @@ class MainWindow():
 		self.showFacesCheckmenuitem = self.builder.get_object("ShowFacesCheckmenuitem")
 		self.grayCheckmenuitem = self.builder.get_object("GrayCheckmenuitem")
 
+		self.idEntry = self.builder.get_object("IdEntry")
+
 		self.pb = gtk.gdk.pixbuf_new_from_file("./resources/NoSignature.png")
 		self.featuresDrawingarea = self.builder.get_object("FeaturesDrawingarea")
 
@@ -110,3 +112,13 @@ class MainWindow():
 		else:
 			self.captureDevice.gray=0
 			self.mainStatusbar.push(0, "Imagen en color")
+
+	def on_SaveButton_clicked(self, widget, data=None):
+		print "Click"
+		id = self.idEntry.get_text()
+		if id=="":
+			print "No hay identificador de individuo !!"
+		else:
+			imgName = "/home/bruno/pfc_UOC/PFM_UOC/Interfaz_GestorAcccesos/resources/imgEmployees/"+id+".jpg"
+			cvSaveImage(imgName, self.captureDevice.getScaledFaceImage())
+

@@ -42,7 +42,6 @@ class Capturador:
 			self.MW.exceptionMessageDialog("Errores en dispositivo de captura", e.__str__())
 			self.openPreferencesDialog(0)
 
-
 	def quit(self, widget=None):
 		gtk.main_quit()
 

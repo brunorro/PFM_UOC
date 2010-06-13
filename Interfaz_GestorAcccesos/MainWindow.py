@@ -44,6 +44,8 @@ class MainWindow:
 		self.employeeAddressEntry = self.builder.get_object("EmployeeAddressEntry")
 		self.employeePhoneEntry = self.builder.get_object("EmployeePhoneEntry")
 		self.employeeMailEntry = self.builder.get_object("EmployeeMailEntry")
+		self.employeePicture = self.builder.get_object("EmployeePicture")
+
 		self.employeeAccessListStore = self.builder.get_object("EmployeeAccessListStore")
 
 		self.fromEmployeeComboboxentry= self.builder.get_object("FromEmployeeComboboxentry")
@@ -116,12 +118,14 @@ class MainWindow:
 		return 1
 
 	def fillEmployeeData(self, employeeData, employeeAccesses):
+		print employeeData[11]
 
 		self.employeeNameEntry.set_text("%s %s" %(employeeData[4], employeeData[5]))
 		self.employeeIdEntry.set_text("%s" % (employeeData[3]))
 		self.employeeAddressEntry.set_text("%s %s" % (employeeData[6], employeeData[7]))
 		self.employeePhoneEntry.set_text("%s" % (employeeData[8]))
 		self.employeeMailEntry.set_text("%s" % (employeeData[9]))
+		self.employeePicture.set_from_file("%s" % employeeData[11])
 
                 self.employeeAccessListStore.clear()
 
