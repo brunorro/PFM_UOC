@@ -104,8 +104,8 @@ class CaptureDevice:
 			#self.image=None
 			#self.grayframe=None
 
-			self.image= cvCreateImage(cvSize(self.frameWidth,self.frameHeight),8,3)
-			self.grayframe = cvCreateImage(cvGetSize(self.image),8,1)
+			self.image= cvCreateImage(cvSize(self.frameWidth,self.frameHeight),IPL_DEPTH_8U,3)
+			self.grayframe = cvCreateImage(cvGetSize(self.image),IPL_DEPTH_8U ,1)
 			print "Recreo imagenes"
 
 		#cv.CV_CAP_PROP_POS_MSEC #cv.CV_CAP_PROP_POS_FRAMES #cv.CV_CAP_PROP_POS_AVI_RATIO

@@ -65,6 +65,7 @@ class MainWindow():
 				self.mainStatusbar.push(0,"Individuo detectado")
 				self.faceSign.setFromImage(self.captureDevice.getScaledFaceImage())
 				self.featuresDrawingarea.window.draw_pixbuf(None, (self.faceSign.getPixbufSignature()).scale_simple(img_width, sign_height, gtk.gdk.INTERP_BILINEAR),0,0,0,0)
+				print self.faceSign.getBitSignature()
 				
 			else:
 				self.featuresDrawingarea.window.draw_pixbuf(None, self.pb.scale_simple(img_width, sign_height, gtk.gdk.INTERP_BILINEAR),0,0,0,0)
@@ -119,6 +120,7 @@ class MainWindow():
 		if id=="":
 			print "No hay identificador de individuo !!"
 		else:
-			imgName = "/home/bruno/pfc_UOC/PFM_UOC/Interfaz_GestorAcccesos/resources/imgEmployees/"+id+".jpg"
-			cvSaveImage(imgName, self.captureDevice.getScaledFaceImage())
+			#imgName = "/home/bruno/pfc_UOC/PFM_UOC/Interfaz_GestorAcccesos/resources/imgEmployees/"+id+".jpg"
+			#cvSaveImage(imgName, self.captureDevice.getScaledFaceImage())
+			print self.faceSign.getBitSignature()
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#/usr/bin/python
 """ @package InterfazReconocimiento """
 
 from math import exp, cos, sin
@@ -31,8 +31,7 @@ def getFeatures(img):
 	hwindow = size_8+size_16
 	w_eye_window = size_4+size_32
 
-	imgY=cvCreateImage(cvSize(width, width), 8, 1)
-	#imgY=cvCreateImage(cvSize(width, height), 8, 1)
+	imgY=cvCreateImage(cvSize(width, width), IPL_DEPTH_16S, 1)
 	cvSobel(img, imgY, 0, 1, 3) 
 
 	ojo_d = __franjaMax(imgY,hwindow, w_eye_window, width/6, width/6, size_2)

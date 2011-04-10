@@ -4,6 +4,7 @@
 from math import exp, cos, sin
 from Exceptions import *
 import gtk
+import sys
 
 try:
 	from opencv.cv import *
@@ -31,7 +32,7 @@ def getFeatures(img):
 	hwindow = size_8+size_16
 	w_eye_window = size_4+size_32
 
-	imgY=cvCreateImage(cvSize(width, width), 8, 1)
+	imgY=cvCreateImage(cvSize(width, width), IPL_DEPTH_16S, 1)
 	#imgY=cvCreateImage(cvSize(width, height), 8, 1)
 	cvSobel(img, imgY, 0, 1, 3) 
 
@@ -210,6 +211,32 @@ class FaceSignature:
 
 		cvCvtColor(imageSignatures,imagePixbuf ,CV_GRAY2RGB)
 		return gtk.gdk.pixbuf_new_from_data(imagePixbuf.imageData,gtk.gdk.COLORSPACE_RGB,0,8,imagePixbuf.width, imagePixbuf.height,imagePixbuf.widthStep)
+
+	def getBitSignature(self):
+		num = 0
+		byteAux = 0
+		strReturn=""
+
+		print sys.getsizeof(byteAux)*8
+
+		for row in self.signRightEye:
+			print row
+
+			for b in row:
+				num+=1
+			
+				byteAux << 1
+				if (b==255):
+					byteAux+=1
+
+				if (num%sys.getsizeof(byteAux)*8==0):
+					print "%x"%byteAux
+#
+#				if (num%sys.getsizeof(byteAux)*8==0):
+#					strReturn+=str(byteAux)
+#					byteAux=0
+#
+		return strReturn
 
 
 	def loadSignature(self, fileNames):
