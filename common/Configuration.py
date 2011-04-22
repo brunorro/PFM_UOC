@@ -8,7 +8,7 @@ class Configuration:
 		""" Constructora
 			\param configFile Fichero XML del que leer la configuracion.
 
-			Se encarga de inicializar la clase con los parametros obtenidos del XML. Caso que no existiesen, inventa parametros por defecto.
+			Se encarga de inicializar la clase con los parametros obtenidos del XML. Caso que no existiesen, aplica parametros por defecto.
 		"""
 
 		self.DB_TYPES= {'SQLITE': 'Sqlite', 'POSTGRES': 'PostgreSQL'}

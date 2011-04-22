@@ -12,7 +12,6 @@ try:
 except:
 	raise OpenCVLibraryNotFoundException()
 
-
 def getFeatures(img):
 	""" Busca la ubicacion de los rasgos
 	\param img Imagen de la que encontrar los rasgos
@@ -213,31 +212,22 @@ class FaceSignature:
 		return gtk.gdk.pixbuf_new_from_data(imagePixbuf.imageData,gtk.gdk.COLORSPACE_RGB,0,8,imagePixbuf.width, imagePixbuf.height,imagePixbuf.widthStep)
 
 	def getBitSignature(self):
-		num = 0
-		byteAux = 0
-		strReturn=""
+		#bstr = lambda n, l=16: n<0 and binarystr((2L<<l)+n) or n and bstr(n>>1).lstrip('0')+str(n&1) or '0'
+		bits=0
+		jerna=""
 
-		print sys.getsizeof(byteAux)*8
+		for row in cvGetMat(self.signMouth):
+			for i in row:
+				bits=bits<<1
+				if i==255:
+					bits=bits+1
+					jerna=jerna+"1"
+				else:
+					jerna=jerna+"0"
 
-		for row in self.signRightEye:
-			print row
-
-			for b in row:
-				num+=1
-			
-				byteAux << 1
-				if (b==255):
-					byteAux+=1
-
-				if (num%sys.getsizeof(byteAux)*8==0):
-					print "%x"%byteAux
-#
-#				if (num%sys.getsizeof(byteAux)*8==0):
-#					strReturn+=str(byteAux)
-#					byteAux=0
-#
-		return strReturn
-
+		print jerna
+		print bits
+		
 
 	def loadSignature(self, fileNames):
 		if len(fileNames)<4:

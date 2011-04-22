@@ -67,6 +67,13 @@ class CaptureDevice:
 
 
 	def setCaptureParameters(self, captureDeviceNumber, cascadeClassifierFile):
+		""" Define los parametros de captura
+
+		\param captureDeviceNumber Identificador de dispositivo de captura
+		\param cascadeClassifierFile Fichero con el clasificador en cascada de Haar
+		
+		Este metodo inicializa la camara y carga el clasificador en cascada de Haar.
+		"""
 
 		configExceptionArray = []
 
@@ -116,7 +123,8 @@ class CaptureDevice:
 
 	def getFaceLocations(self):
 		""" Obtiene la localizacion de las caras 
-		A partir del ultimo fotograma obtenido, este metodo obtiene la ubicacion de las caras."""
+
+		A partir del ultimo fotograma obtenido, obtiene una lista de la ubicacion de las caras y la deja en el atributo faceLocationList ."""
 
 		self.faceLocationList =[]
 
@@ -147,7 +155,7 @@ class CaptureDevice:
 	def getPixbuf(self):
 		""" Genera un gtk-pixbuf
 		
-		Este metodo devuelve un pixbuf para mostrarlo en una aplicacion GTK a partir del ultimo frame obtenido via opencv. """
+		Devuelve un pixbuf para mostrarlo en una aplicacion GTK a partir del ultimo frame obtenido via opencv. """
 
 		rectanglePointList = []
 
@@ -177,11 +185,17 @@ class CaptureDevice:
 
 	def getFaces(self):
 		""" Obtiene la localizacion de las caras
+
 		Devuelve una lista con la ubicacion de las caras detectadas en la imagen """
+
 		self.getFaceLocations()
 		return self.faceLocationList
 
 	def getScaledFaceImage(self):
+		""" Devuelve una imagen escalada de las caras encontradas
+
+		Devuelve una imagen escalada al tamanyo definido por aplicacion (actualmente 128x128) de las caras encontradas en la imagen """
+
 		if len(self.faceLocationList)>0:
 			imgReturn = cvCreateImage(cvSize(128,128), IPL_DEPTH_8U, 1)
 			cvResize(cvGetSubRect(self.grayframe, cvRect(self.faceLocationList[0][0], self.faceLocationList[0][1], \

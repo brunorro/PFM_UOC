@@ -66,7 +66,8 @@ class MainWindow():
 				self.faceSign.setFromImage(self.captureDevice.getScaledFaceImage())
 
 				if self.faceSignAux != None:
-					print self.faceSign.compareSignatureEuc(self.faceSignAux)
+					#print self.faceSign.compareSignatureEuc(self.faceSignAux)
+					self.faceSign.getBitSignature()
 				else :
 					self.faceSignAux = self.parentClass.faceSignAux
 				self.faceSignAux.setFromImage(self.captureDevice.getScaledFaceImage())

@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <config>
-	<database><dbDriver>SQLITE</dbDriver><param name="dbFile">../BBDD_GestorAccesos/GestorAccesos.bd</param></database>
+	<database><dbDriver>SQLITE</dbDriver><param name="dbFile">/home/bruno/pfc_UOC/Semestre2/PAC2/PFM_UOC/BBDD_GestorAccesos/GestorAccesos.bd</param></database>
 </config>
